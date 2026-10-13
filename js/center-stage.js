@@ -5,7 +5,7 @@ import { game, dom } from './game.js?v=100';
 import { setBriefcaseAmount, isBigValue, isLowValue, isHighestRemaining, triggerDangerFlash, triggerYellowFlash } from './helpers.js?v=101';
 import { caseInnerMarkup, flashTableShelves, clearShelfFlash } from './render.js?v=102';
 import { applyInteriorBg, getInteriorBgId, applyInteriorAmountStyling } from './customization.js?v=104';
-import { revealSoundLow, revealSoundHigh, playRevealSound, startTensionRoll } from './sound.js?v=105';
+import { revealSoundLow, revealSoundHigh, playRevealSound, startTensionRoll, stopBankerRingLoop } from './sound.js?v=106';
 
 export function hideAll() {
   awaitingContinue = false;
@@ -18,6 +18,8 @@ export function hideAll() {
   dom.caseGrid.classList.remove('reveal-focus');
   clearShelfFlash();
   dom.offerBackdrop.classList.remove('show');
+  dom.bankerCallBtn.style.display = 'none';
+  stopBankerRingLoop();
   dom.offersPanel.style.display = 'none';
   dom.finalBackdrop.classList.remove('show');
   dom.endBackdrop.classList.remove('show');

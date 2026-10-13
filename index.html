@@ -91,8 +91,14 @@
     <span>Hide Opened Cases<br><small>Remove opened briefcases from the grid after they are revealed.</small></span>
   </label>
   <label class="settings-row">
+    <input type="checkbox" id="hostModeToggle">
+    <span>Host Mode
+      <br><small>Enable CALL/END CALL flow in the banker panel.</small>
+    </span>
+  </label>
+  <label class="settings-row">
     <input type="checkbox" id="gameLogEnabledToggle" checked>
-    <span>Enable Game Log<br><small>Show the activity report panel in the bottom-right corner. Turn off to hide it and stop recording.</small></span>
+    <span>Enable Game Log<br><small>Show/hide the bottom‑right log panel.</small></span>
   </label>
   <div class="settings-title settings-section-title" style="margin-bottom:8px;">🔊 Sound</div>
   <label class="settings-row">
@@ -200,6 +206,7 @@
   <div class="modal banker-call-card" id="bankerCallCard">
     <div class="phone-icon">☎️</div>
     <div class="offer-status" id="offerStatus">The banker is calling...</div>
+    <button id="bankerCallBtn" class="call" style="display:none;">CALL</button>
     <div id="offerContent" style="display:none;">
       <div class="offer-label" id="offerLabel">The Banker Offers You</div>
       <button class="btn primary" id="revealOfferBtn" style="display:none;">Reveal</button>
@@ -272,7 +279,7 @@
     } else {
       var s = document.createElement('script');
       s.type = 'module';
-      s.src = 'js/main.js?v=24';
+      s.src = 'js/main.js?v=28';
       document.body.appendChild(s);
     }
   })();

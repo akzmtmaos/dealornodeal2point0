@@ -5,7 +5,7 @@ import { game, dom } from './game.js?v=100';
 import { fmt, fmtDisplayBoard, logEvent } from './helpers.js?v=101';
 import { renderGrid } from './render.js?v=102';
 import { updateStatus } from './center-stage.js?v=103';
-import { acceptOffer, renderOffersHistory, showFinalDecision } from './banker.js?v=106';
+import { acceptOffer, renderOffersHistory, showFinalDecision } from './banker.js?v=108';
 
 export function revealCounterDecision() {
   const accepted = game.pendingCounterAccepted;

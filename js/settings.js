@@ -31,7 +31,7 @@ function saveSettings() {
     gameLogEnabled: game.gameLogEnabled,
     caseCount: game.caseCount,
     sfxEnabled: game.sfxEnabled,
-    sfxVolumePercent: game.sfxVolumePercent,
+    hostMode: game.hostMode,
   };
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
@@ -80,6 +80,10 @@ function loadSettings() {
     if (typeof s.sfxVolumePercent === 'number' && s.sfxVolumePercent >= 0 && s.sfxVolumePercent <= 200) {
       game.sfxVolumePercent = s.sfxVolumePercent;
       dom.sfxVolumeInput.value = s.sfxVolumePercent;
+    }
+    if (typeof s.hostMode === 'boolean') {
+      game.hostMode = s.hostMode;
+      dom.hostModeToggle.checked = s.hostMode;
     }
   } catch (e) { /* ignore */ }
   applySfxLevel();
@@ -178,6 +182,10 @@ dom.currencyBriefcaseToggle.addEventListener('change', () => {
 dom.gameLogEnabledToggle.addEventListener('change', () => {
   game.gameLogEnabled = dom.gameLogEnabledToggle.checked;
   applyGameLogVisibility();
+});
+
+dom.hostModeToggle.addEventListener('change', () => {
+  game.hostMode = dom.hostModeToggle.checked;
 });
 
 /** Shows/hides the bottom-right log panel to match the current setting. */

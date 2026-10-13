@@ -32,7 +32,8 @@
   /* ---------- Banker decisions ---------- */
   #dealBtn,
   #noDealBtn,
-  #counterLinkBtn{
+  #counterLinkBtn,
+  #bankerCallBtn{
     border:none;
     border-radius:8px;
     padding:11px 12px;
@@ -44,6 +45,20 @@
     text-decoration:none;
     text-transform:uppercase;
     box-shadow:inset 0 1px 0 rgba(255,255,255,0.28), inset 0 -3px 0 rgba(0,0,0,0.26), 0 3px 7px rgba(0,0,0,0.3);
+  }
+  #bankerCallBtn{
+    display:block;
+    width:100%;
+    margin:14px auto 0;
+    cursor:pointer;
+  }
+  #bankerCallBtn.call{
+    background:linear-gradient(180deg,#54c98c,#218356);
+    -webkit-text-stroke:0.2px rgba(255,255,255,0.45);
+  }
+  #bankerCallBtn.end-call{
+    background:linear-gradient(180deg,#ef6470,#b31f35);
+    -webkit-text-stroke:0.2px rgba(255,255,255,0.45);
   }
   #dealBtn{
     background:linear-gradient(180deg,#54c98c,#218356);
@@ -61,7 +76,8 @@
   }
   #dealBtn:hover:not(:disabled),
   #noDealBtn:hover:not(:disabled),
-  #counterLinkBtn:hover:not(:disabled){
+  #counterLinkBtn:hover:not(:disabled),
+  #bankerCallBtn:hover:not(:disabled){
     filter:brightness(1.12);
     transform:translateY(-1px);
   }

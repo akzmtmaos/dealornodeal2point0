@@ -8,11 +8,63 @@ import { revealCaseAnimated, updateStatus, hideAll } from './center-stage.js?v=1
 import { showFinalDecision } from './final.js?v=114';
 import { endGame } from './end.js?v=115';
 import { revealCounterDecision } from './counter.js?v=107';
-import { playBankerRing } from './sound.js?v=105';
+import { playBankerRing, startBankerRingLoop, stopBankerRingLoop } from './sound.js?v=106';
 
 // Re-export for counter.js, which (like the original monolith) reaches the
 // final-decision screen through the banker module.
 export { showFinalDecision };
+
+let speechVoices = [];
+function updateSpeechVoices() {
+  if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    speechVoices = window.speechSynthesis.getVoices();
+  }
+}
+if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+  updateSpeechVoices();
+  window.speechSynthesis.onvoiceschanged = updateSpeechVoices;
+}
+
+export function speakBankerOffer(amount, isHypothetical = false) {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+
+  if (game.sfxEnabled === false) return;
+
+  const spokenAmount = Math.round(amount).toLocaleString('en-US');
+  const text = isHypothetical
+    ? `Hello again. Had you kept playing, my offer would have been ${spokenAmount} dollars.`
+    : `Hello. For this round, my offer is ${spokenAmount} dollars.`;
+
+  const utterance = new SpeechSynthesisUtterance(text);
+
+  if (speechVoices.length === 0) {
+    speechVoices = window.speechSynthesis.getVoices();
+  }
+  const enVoices = speechVoices.filter(v => v.lang && v.lang.startsWith('en'));
+  const preferredVoice = enVoices.find(v => {
+    const name = (v.name || '').toLowerCase();
+    return name.includes('male') || name.includes('david') || name.includes('george') || name.includes('guy');
+  }) || enVoices[0] || speechVoices[0];
+
+  if (preferredVoice) {
+    utterance.voice = preferredVoice;
+  }
+
+  utterance.rate = 0.95;
+  utterance.pitch = 0.85;
+  if (typeof game.sfxVolumePercent === 'number') {
+    utterance.volume = Math.min(1, Math.max(0, game.sfxVolumePercent / 100));
+  }
+
+  window.speechSynthesis.speak(utterance);
+}
+
+export function stopBankerSpeech() {
+  if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+  }
+}
 
 function setCustomBankOfferVisible(visible) {
   dom.customBankOfferWrap.classList.toggle('visible', visible);
@@ -223,6 +275,17 @@ export function triggerBankerOffer() {
   dom.offerBackdrop.classList.add('calling-red');
   document.body.classList.add('calling-red-bg');
   dom.phoneIconEl.classList.add('calling');
+  dom.bankerCallBtn.style.display = 'none';
+  dom.bankerCallBtn.textContent = 'CALL';
+  dom.bankerCallBtn.className = 'call';
+
+  if (game.hostMode) {
+    game.lastOffer = computeOffer();
+    dom.bankerCallBtn.style.display = 'block';
+    startBankerRingLoop();
+    return;
+  }
+
   playBankerRing(2);
 
   setTimeout(() => {
@@ -283,9 +346,15 @@ export function acceptOffer(amount) {
   dom.offerBackdrop.classList.remove('calling-red');
   document.body.classList.remove('calling-red-bg');
   dom.phoneIconEl.classList.remove('calling');
+  dom.bankerCallBtn.style.display = 'none';
+  stopBankerSpeech();
+  stopBankerRingLoop();
 }
 
 export function declineOffer() {
+  dom.bankerCallBtn.style.display = 'none';
+  stopBankerSpeech();
+  stopBankerRingLoop();
   hideOffersPanel();
   dom.offerBackdrop.classList.remove('show');
   setCustomBankOfferVisible(false);
@@ -341,6 +410,19 @@ export function triggerHypotheticalOffer() {
   dom.offerBackdrop.classList.add('calling-red');
   document.body.classList.add('calling-red-bg');
   dom.phoneIconEl.classList.add('calling');
+  dom.bankerCallBtn.style.display = 'none';
+  dom.bankerCallBtn.textContent = 'CALL';
+  dom.bankerCallBtn.className = 'call';
+
+  if (game.hostMode) {
+    const hypoOffer = computeOffer();
+    game.lastOffer = hypoOffer;
+    game.revealMode = 'hypothetical';
+    dom.bankerCallBtn.style.display = 'block';
+    startBankerRingLoop();
+    return;
+  }
+
   playBankerRing(2);
 
   setTimeout(() => {
@@ -483,3 +565,33 @@ dom.continuePlayoutBtn.addEventListener('click', () => {
 
 dom.dealBtn.addEventListener('click', () => acceptOffer(game.lastOffer));
 dom.noDealBtn.addEventListener('click', declineOffer);
+
+dom.bankerCallBtn.addEventListener('click', () => {
+  stopBankerRingLoop();
+  if (dom.bankerCallBtn.textContent === 'CALL') {
+    dom.offerModalEl.classList.remove('banker-calling');
+    dom.phoneIconEl.classList.remove('calling');
+    dom.offerBackdrop.classList.remove('calling-red');
+    document.body.classList.remove('calling-red-bg');
+    dom.offerStatus.textContent = 'On call with the Banker...';
+    dom.bankerCallBtn.textContent = 'END CALL';
+    dom.bankerCallBtn.className = 'end-call';
+    speakBankerOffer(game.lastOffer, game.revealMode === 'hypothetical');
+  } else {
+    stopBankerSpeech();
+    dom.bankerCallBtn.style.display = 'none';
+    dom.bankerCallBtn.textContent = 'CALL';
+    dom.bankerCallBtn.className = 'call';
+    dom.offerStatus.style.display = 'none';
+    if (game.revealMode === 'hypothetical') {
+      game.hypotheticalOffers.push({ round: game.roundIndex + 1, amount: game.lastOffer });
+      logEvent(`[Round ${game.roundIndex + 1}] Hypothetical offer (had you kept playing): <b>${fmt(game.lastOffer)}</b>`);
+    } else {
+      logEvent(`[Round ${game.roundIndex + 1}] Banker's Offer: <b>${fmt(game.lastOffer)}</b>`);
+    }
+    dom.offerContent.style.display = 'block';
+    dom.revealOfferBtn.style.display = '';
+    dom.revealOfferBtn.classList.add('fade-in');
+  }
+});
+

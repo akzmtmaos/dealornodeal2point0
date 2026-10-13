@@ -211,6 +211,30 @@ export function playBankerRing(rings) {
   }
 }
 
+let bankerRingInterval = null;
+
+/** Repeatedly rings the phone bell until stopBankerRingLoop is called. */
+export function startBankerRingLoop() {
+  stopBankerRingLoop();
+  if (game.sfxEnabled === false) return;
+  playBankerRing(1);
+  bankerRingInterval = setInterval(() => {
+    if (game.sfxEnabled === false) {
+      stopBankerRingLoop();
+      return;
+    }
+    playBankerRing(1);
+  }, 2000);
+}
+
+/** Stops the looping banker ring. */
+export function stopBankerRingLoop() {
+  if (bankerRingInterval) {
+    clearInterval(bankerRingInterval);
+    bankerRingInterval = null;
+  }
+}
+
 /** Synthesized light cross-off — the fallback when the recorded
  *  light sting can't play: a crisp rising double-tick with a soft
  *  confirm ping as the tile lands dark. */
