@@ -305,7 +305,7 @@ export function renderOffersHistory() {
   game.offerHistory.forEach((entry, i) => {
     const chip = document.createElement('div');
     chip.className = 'offer-chip offer-sequence-item' + (i === game.offerHistory.length - 1 ? ' latest' : '');
-    chip.style.setProperty('--offer-sequence-delay', `${i * 120}ms`);
+    chip.style.setProperty('--offer-sequence-delay', `${i * 500}ms`);
     chip.innerHTML = `<span class="oc-amount">${fmt(entry.amount)}</span>`;
     dom.offersList.appendChild(chip);
   });
@@ -313,7 +313,10 @@ export function renderOffersHistory() {
 
 export function showOffersPanel() {
   renderOffersHistory();
-  dom.offersPanel.style.display = game.offerHistory.length > 0 ? 'block' : 'none';
+  if (game.offerHistory.length > 0) {
+    dom.offersPanel.style.display = 'block';
+    dom.offersPanel.classList.add('show');
+  }
 }
 
 export function hideOffersPanel() {
