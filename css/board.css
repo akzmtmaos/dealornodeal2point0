@@ -119,38 +119,6 @@
   .btn.danger:hover:not(:disabled){filter:brightness(1.1);}
   .btn.ghost{background:transparent;font-size:0.85rem;padding:10px 20px;}
 
-  .emoji-btn{
-    position:fixed;
-    top:14px;
-    right:14px;
-    width:34px;
-    height:34px;
-    border-radius:50%;
-    border:1px solid rgba(139,147,168,0.25);
-    background:rgba(255,255,255,0.03);
-    color:var(--muted);
-    font-size:1rem;
-    cursor:pointer;
-    z-index:80;
-    transition:all .2s ease;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-  }
-  .emoji-btn:hover{
-    color:var(--gold);
-    border-color:var(--gold-dim);
-    background:rgba(231,187,77,0.08);
-  }
-  .emoji-btn.primary{
-    background:linear-gradient(145deg,var(--gold-bright),var(--gold));
-    color:#221a05;
-    border:none;
-    font-size:0.85rem;
-    padding:10px 20px;
-    border-radius:999px;
-  }
-  .emoji-btn.primary:hover:not(:disabled){filter:brightness(1.08);}
   .board{
     display:flex;
     justify-content:center;
@@ -535,35 +503,39 @@
      transparent container, one yellow square per character ($ and commas get
      their own cell), blank squares padding the strip to the same 7-slot
      width as a $1,000,000 board tile. No black frame.
-     js/customization.js rebuilds the tile's plain text into these cells. */  .banker-offer-tile.offer-squares{
-    /* Banker offer frame: bright golden-yellow outer frame, dark interior, 
-       no black anywhere. No rounded corners. */
+     js/customization.js rebuilds the tile's plain text into these cells. */
+  .banker-offer-tile.offer-squares{
+    /* Dark offer-board frame like the TV show: near-black panel, solid black
+       outer border, yellow pinline just inside the border. */
     background:#1c1c1e;
-    border:2px solid #e7e864;
-    border-radius:0;
-    box-shadow:0 0 0 2px #e7e864, 0 3px 6px rgba(0,0,0,0.35);
+    border:3px solid #000;
+    border-radius:8px;
+    box-shadow:inset 0 0 0 2px var(--yellow), 0 3px 6px rgba(0,0,0,0.35);
     /* Match the classic tile's footprint (min-height:1.8em + 5px padding at
        2.1rem — the same box DEAL / NO DEAL get); border-box keeps the outer
        size identical, the cells just sit inside the frame. */
     min-height:1.8em;
     align-items:stretch;
-    padding:3px 6px;
-    gap:2px;
+    padding:6px 9px;
+    gap:3px;
     color:#1a1608;
     -webkit-text-stroke:0;
   }
-  /* Same yellow-cell recipe as the board, scaled up to offer-tile size:     cells stretch the full height of the tile and share its width (44px cap     keeps 7-slot rows chunky; 9-slot rows like 1,000,000 shrink to fit     instead of overflowing). */
+  /* Same yellow-cell recipe as the board, scaled up to offer-tile size:
+     cells stretch the full height of the tile and share its width (44px cap
+     keeps 7-slot rows chunky; 9-slot rows like 1,000,000 shrink to fit
+     instead of overflowing). */
   .banker-offer-tile.offer-squares .offer-sq-char{
     display:flex;
     align-items:center;
     justify-content:center;
     flex:1 1 0;
     min-width:0;
-    max-width:100px;
+    max-width:44px;
     height:auto;
-    background:#e7e864;
+    background:linear-gradient(180deg,#fff07a 0%,#ffd84d 48%,#e8b72f 100%);
     border-radius:4px;
-    box-shadow:none;
+    box-shadow:inset 0 1px 2px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.1);
     font-size:2.1rem;
     font-weight:900;
     line-height:1;

@@ -46,7 +46,7 @@ export function newGame() {
   game.hypotheticalOffers = [];
   game.revealMode = 'real';
   game.editMode = false;
-  dom.editToggle.textContent = '✎';
+  dom.editToggle.textContent = 'Edit Values';
   dom.editToggle.disabled = false;
   dom.bankerOfferDisplay.classList.remove('flip-anim', 'no-deal', 'counter-offer');
   dom.bankerOfferDisplay.textContent = '';
