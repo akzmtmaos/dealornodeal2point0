@@ -97,7 +97,7 @@
   .pb-item-delete{background:none;border:none;color:var(--muted);font-size:0.85rem;cursor:pointer;padding:2px 6px;border-radius:4px;transition:color .15s;}
   .pb-item-delete:hover{color:var(--danger);}
   .pb-empty{font-size:0.75rem;color:var(--muted);text-align:center;padding:12px 0;}
-  .board-save-btn{width:30px;height:30px;border-radius:50%;border:1px solid rgba(139,147,168,0.25);background:rgba(255,255,255,0.03);color:var(--muted);font-size:0.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s ease;flex-shrink:0;}
+  .board-save-btn{position:fixed;top:14px;right:14px;width:30px;height:30px;border-radius:50%;border:1px solid rgba(139,147,168,0.25);background:rgba(255,255,255,0.03);color:var(--muted);font-size:0.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s ease;flex-shrink:0;}
   .board-save-btn:hover{color:var(--gold);border-color:var(--gold-dim);background:rgba(231,187,77,0.08);}
 
   /* ---------- Suggestion Panel ---------- */
