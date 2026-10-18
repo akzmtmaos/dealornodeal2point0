@@ -257,7 +257,7 @@ export function updateToolbar() {
   dom.resetValuesBtn.disabled = !preGame;
   if (!preGame && game.editMode) {
     game.editMode = false;
-    dom.editToggle.textContent = 'Edit Values';
+    dom.editToggle.textContent = '✎';
   }
 }
 

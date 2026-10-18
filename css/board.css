@@ -119,6 +119,38 @@
   .btn.danger:hover:not(:disabled){filter:brightness(1.1);}
   .btn.ghost{background:transparent;font-size:0.85rem;padding:10px 20px;}
 
+  .emoji-btn{
+    position:fixed;
+    top:14px;
+    right:14px;
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    border:1px solid rgba(139,147,168,0.25);
+    background:rgba(255,255,255,0.03);
+    color:var(--muted);
+    font-size:1rem;
+    cursor:pointer;
+    z-index:80;
+    transition:all .2s ease;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .emoji-btn:hover{
+    color:var(--gold);
+    border-color:var(--gold-dim);
+    background:rgba(231,187,77,0.08);
+  }
+  .emoji-btn.primary{
+    background:linear-gradient(145deg,var(--gold-bright),var(--gold));
+    color:#221a05;
+    border:none;
+    font-size:0.85rem;
+    padding:10px 20px;
+    border-radius:999px;
+  }
+  .emoji-btn.primary:hover:not(:disabled){filter:brightness(1.08);}
   .board{
     display:flex;
     justify-content:center;
