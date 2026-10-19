@@ -129,6 +129,10 @@ function renderOfferTileSquares() {
       value.className = 'sq-char-value';
       value.textContent = ch;
       span.appendChild(value);
+      // Make font size a bit small in offer container
+      value.style.fontSize = '0.85em';
+      value.style.padding = '4px 2px';
+      tile.style.padding = '4px 2px';
     }
     tile.appendChild(span);
   }
