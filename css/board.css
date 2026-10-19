@@ -537,21 +537,15 @@
      width as a $1,000,000 board tile. No black frame.
      js/customization.js rebuilds the tile's plain text into these cells. */
   .banker-offer-tile.offer-squares{
-    /* Dark offer-board frame like the TV show: near-black panel, solid black
-       outer border, yellow pinline just inside the border. */
-    background:#1c1c1e;
-    border:3px solid #000;
-    border-radius:8px;
-    box-shadow:inset 0 0 0 2px var(--yellow), 0 3px 6px rgba(0,0,0,0.35);
-    /* Match the classic tile's footprint (min-height:1.8em + 5px padding at
-       2.1rem — the same box DEAL / NO DEAL get); border-box keeps the outer
-       size identical, the cells just sit inside the frame. */
-    min-height:1.8em;
-    align-items:stretch;
-    padding:6px 9px;
-    gap:3px;
-    color:#1a1608;
-    -webkit-text-stroke:0;
+    background: #1c1c1e;
+    border-radius: 0px;
+    box-shadow: inset 0 0 0 2px #e5ea75, 0 3px 6px rgba(0, 0, 0, 0.35);
+    min-height: 1.8em;
+    align-items: stretch;
+    padding: 6px 9px;
+    gap: 3px;
+    color: #1a1608;
+    -webkit-text-stroke: 0;
   }
   /* Same yellow-cell recipe as the board, scaled up to offer-tile size:
      cells stretch the full height of the tile and share its width (44px cap
@@ -565,10 +559,10 @@
     min-width:0;
     max-width:44px;
     height:auto;
-    background:linear-gradient(180deg,#fff07a 0%,#ffd84d 48%,#e8b72f 100%);
+    background:#e5ea75;
     border-radius:4px;
     box-shadow:inset 0 1px 2px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.1);
-    font-size:2.1rem;
+    font-size:1.2em;
     font-weight:900;
     line-height:1;
   }
