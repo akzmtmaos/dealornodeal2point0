@@ -110,44 +110,14 @@ const DANGER_REVEAL_SFX_LEGACY_URL = 'js/sounds/dangeramountreveal.mp3';
  *  is needed. If a re-exported file gains a soft intro, raise this to skip it. */
 const REVEAL_SFX_START_SEC = 0;
 
-/** Below $100K (good news): the recorded light reveal sting. Falls
- *  back to the legacy path, then a media element, then the synth
- *  chime, if the file can't load or play. */
+/** Below $100K (good news): the recorded light reveal sting. */
 export function revealSoundLow() {
-  playRecordedSfx([LIGHT_REVEAL_SFX_URL, LIGHT_REVEAL_SFX_LEGACY_URL], REVEAL_SFX_START_SEC, revealSoundLowSynth);
+  playRecordedSfx([LIGHT_REVEAL_SFX_URL, LIGHT_REVEAL_SFX_LEGACY_URL], REVEAL_SFX_START_SEC);
 }
 
-/** $100K and up (danger): the recorded danger reveal sting, with the
- *  same fallback chain ending in the synth boom-and-growl. */
+/** $100K and up (danger): the recorded danger reveal sting. */
 export function revealSoundHigh() {
-  playRecordedSfx([DANGER_REVEAL_SFX_URL, DANGER_REVEAL_SFX_LEGACY_URL], REVEAL_SFX_START_SEC, revealSoundHighSynth);
-}
-
-/** Synthesized light reveal — the fallback when the recorded
- *  lightamountreveal sting can't play: a soft "thwack" then a bright
- *  rising two-note chime, celebratory but lighter than the big-money sting. */
-function revealSoundLowSynth() {
-  const ctx = getAudioCtx();
-  if (!ctx) return;
-  const t0 = ctx.currentTime + 0.02;
-  playNoiseBurst(ctx, t0, 0.07, 0.14, 2600);
-  scheduleTone(ctx, 'sine', 130, t0, 0.22, 0.14);                  // warm floor note
-  scheduleTone(ctx, 'triangle', 880, t0 + 0.03, 0.16, 0.16);       // A5
-  scheduleTone(ctx, 'triangle', 1318.51, t0 + 0.13, 0.34, 0.13);   // E6
-}
-
-/** Synthesized danger reveal — the fallback when the recorded
- *  dangeramountreveal sting can't play: the drumroll lands on a big
- *  hit — sub boom + noise crash — then a growl glides down as the
- *  amount registers. */
-function revealSoundHighSynth() {
-  const ctx = getAudioCtx();
-  if (!ctx) return;
-  const t0 = ctx.currentTime + 0.02;
-  scheduleTone(ctx, 'sine', 98, t0, 0.6, 0.65);                    // deep sub boom
-  playNoiseBurst(ctx, t0, 0.18, 0.38, 1800);                      // crash
-  scheduleTone(ctx, 'sawtooth', 440, t0 + 0.03, 0.5, 0.28, 110, 900); // A4 -> A2 growl
-  scheduleTone(ctx, 'square', 233.08, t0 + 0.08, 0.32, 0.11, 116.54, 500);
+  playRecordedSfx([DANGER_REVEAL_SFX_URL, DANGER_REVEAL_SFX_LEGACY_URL], REVEAL_SFX_START_SEC);
 }
 
 /** One short ratchet tick for the offer strip — played every time a square's
@@ -249,40 +219,14 @@ export function stopBankerRingLoop() {
   }
 }
 
-/** Synthesized light cross-off — the fallback when the recorded
- *  light sting can't play: a crisp rising double-tick with a soft
- *  confirm ping as the tile lands dark. */
-function boardEliminateLowSynth() {
-  const ctx = getAudioCtx();
-  if (!ctx) return;
-  const t0 = ctx.currentTime + 0.02;
-  scheduleTone(ctx, 'triangle', 523.25, t0, 0.06, 0.16);          // C5 tick
-  scheduleTone(ctx, 'triangle', 659.25, t0 + 0.07, 0.07, 0.15);   // E5 tick
-  scheduleTone(ctx, 'sine', 1046.5, t0 + 0.16, 0.16, 0.1);        // C6 ping
-  playNoiseBurst(ctx, t0 + 0.97, 0.05, 0.09, 2000);               // flip lands
-}
-
-/** One heavy "BANG": a low sine that drops in pitch with a bright noise slap
- *  on the attack, like a giant impact — punchy, then it rings off. */
-function stompAt(ctx, startAt, freq, peak) {
-  scheduleTone(ctx, 'sine', freq, startAt, 0.55, peak, freq * 0.5);
-  playNoiseBurst(ctx, startAt, 0.12, peak * 0.45, 900);
-}
-
-/** One loud board-impact THOMP for danger values — also the fallback when the
- *  recorded danger sting can't play. */
-function boardEliminateDangerThomp() {
-  const ctx = getAudioCtx();
-  if (!ctx) return;
-  const t0 = ctx.currentTime + 0.02;
-  stompAt(ctx, t0, 62, 0.78);
-}
-
 /** Recorded danger sting locations, resolved from this module's own path so
  *  both builds load the same shared file no matter where index.html lives.
  *  The legacy document-relative path is kept as a fallback for older copies. */
 const DANGER_SFX_URL = new URL('./sounds/danger.mp3', import.meta.url).href;
 const DANGER_SFX_LEGACY_URL = 'js/sounds/danger.mp3';
+
+/** Cache of decoded audio buffers for instant playback without repeat fetch/decode overhead. */
+const sfxBufferCache = new Map();
 
 /** decodeAudioData wrapper that also works on older callback-only
  *  engines — the deprecated callbacks still fire in modern ones, and
@@ -294,93 +238,78 @@ function decodeSfxBuffer(ctx, arrayBuffer) {
   });
 }
 
-/** Plays one recorded SFX from a decoded buffer: a fresh BufferSource
- *  per play lets quick reveals overlap, and the audio rides the master
- *  gain like every other SFX (so the 0–130% Sound Effects setting
- *  applies, including values above 100%). `startSec` skips any soft
- *  lead-in on the decoded-buffer path. */
-function playRecordedSfxFrom(fullUrls, urls, startSec, synthFallback) {
+function playAudioBuffer(ctx, audioBuffer, startSec) {
+  const src = ctx.createBufferSource();
+  src.buffer = audioBuffer;
+  src.connect(audioMasterGain || ctx.destination);
+  const offset = Math.min(startSec, Math.max(0, audioBuffer.duration - 0.05));
+  src.start(0, offset);
+}
+
+/** Plays one recorded SFX: tries pre-cached AudioBuffer, then fetch/decode,
+ *  then Audio element. Never falls back to synth tones. */
+function playRecordedSfxFrom(fullUrls, urls, startSec) {
   if (!urls.length) {
-    // Nothing could be decoded (e.g. file:// blocks fetch) — still
-    // try the recording via a media element, then the synth fallback.
-    playRecordedSfxElement(fullUrls, synthFallback);
+    playRecordedSfxElement(fullUrls);
     return;
   }
+  const url = urls[0];
   const rest = urls.slice(1);
   const ctx = getAudioCtx();
   if (!ctx) {
-    playRecordedSfxElement(fullUrls, synthFallback);
+    playRecordedSfxElement(fullUrls);
     return;
   }
-  fetch(urls[0])
+  if (sfxBufferCache.has(url)) {
+    playAudioBuffer(ctx, sfxBufferCache.get(url), startSec);
+    return;
+  }
+  fetch(url)
     .then(function (response) {
       if (!response.ok) throw new Error('sfx HTTP ' + response.status);
       return response.arrayBuffer();
     })
     .then(function (arrayBuffer) { return decodeSfxBuffer(ctx, arrayBuffer); })
     .then(function (audioBuffer) {
-      const src = ctx.createBufferSource();
-      src.buffer = audioBuffer;
-      src.connect(audioMasterGain || ctx.destination);
-      // start(when, offset) guarantees the lead-in skip; clamp so an
-      // offset past the end can never throw and break the chain.
-      const offset = Math.min(startSec, Math.max(0, audioBuffer.duration - 0.05));
-      src.start(0, offset);
+      sfxBufferCache.set(url, audioBuffer);
+      playAudioBuffer(ctx, audioBuffer, startSec);
     })
-    .catch(function () { playRecordedSfxFrom(fullUrls, rest, startSec, synthFallback); });
+    .catch(function () { playRecordedSfxFrom(fullUrls, rest, startSec); });
 }
 
-/** Last-resort media-element playback. Plays the recording from its
- *  start — only the Web Audio path can guarantee the offset. */
-function playRecordedSfxElement(urls, synthFallback) {
-  if (!urls.length) {
-    synthFallback();
-    return;
-  }
+/** Last-resort media-element playback. */
+function playRecordedSfxElement(urls) {
+  if (!urls.length) return;
   const rest = urls.slice(1);
   try {
     const a = new Audio(urls[0]);
-    // HTMLMediaElement.volume only accepts [0,1] and THROWS above 1 —
-    // the SFX volume setting can exceed 100%, so clamp it. Setting it
-    // inside the try means any media failure falls back to the next
-    // URL (or the synth) instead of breaking the reveal chain.
     a.volume = game.sfxEnabled ? Math.min(1, Math.max(0, game.sfxVolumePercent) / 100) : 0;
     const p = a.play();
-    if (p && typeof p.catch === 'function') p.catch(function () { playRecordedSfxElement(rest, synthFallback); });
+    if (p && typeof p.catch === 'function') p.catch(function () { playRecordedSfxElement(rest); });
   } catch (e) {
-    playRecordedSfxElement(rest, synthFallback);
+    playRecordedSfxElement(rest);
   }
 }
 
-/** Plays a recorded SFX from `urls` (module-relative first, legacy
- *  second): decode-and-buffer first, media element second, synthesized
- *  fallback last. */
-function playRecordedSfx(urls, startSec, synthFallback) {
-  playRecordedSfxFrom(urls, urls.slice(), startSec, synthFallback);
+/** Plays a recorded SFX from `urls`: decoded buffer first, HTMLAudioElement second. */
+function playRecordedSfx(urls, startSec = 0) {
+  playRecordedSfxFrom(urls, urls.slice(), startSec);
 }
 
-/** Recorded danger sting, played from the beginning when a danger amount
- *  ($100K+) is crossed off the board. Falls back to the legacy path, then a
- *  media element, then the synthesized THOMP, if the file can't load or play. */
+/** Recorded danger sting, played when a danger amount ($100K+) is crossed off the board. */
 function playDangerSfx() {
-  playRecordedSfx([DANGER_SFX_URL, DANGER_SFX_LEGACY_URL], 0, boardEliminateDangerThomp);
+  playRecordedSfx([DANGER_SFX_URL, DANGER_SFX_LEGACY_URL], 0);
 }
 
-/** Recorded light cross-off sting location (below-$100K board
- *  removals), resolved like the danger sting. */
+/** Recorded light cross-off sting location (below-$100K board removals). */
 const LIGHT_ELIM_SFX_URL = new URL('./sounds/light.mp3', import.meta.url).href;
 const LIGHT_ELIM_SFX_LEGACY_URL = 'js/sounds/light.mp3';
 
-/** The light recording starts right on the tick, so no lead-in
- *  offset is needed. If a re-exported file gains a soft intro,
- *  raise this to skip it. */
 const LIGHT_ELIM_SFX_START_SEC = 0;
 
-/** Below-$100K cross-off: the recorded light sting. Falls back to
- *  the legacy path, then a media element, then the synthesized
- *  double-tick, if the file can't load or play. */
+/** Below-$100K cross-off: the recorded light sting. */
 function boardEliminateLow() {
-  playRecordedSfx([LIGHT_ELIM_SFX_URL, LIGHT_ELIM_SFX_LEGACY_URL], LIGHT_ELIM_SFX_START_SEC, boardEliminateLowSynth);
+  playRecordedSfx([LIGHT_ELIM_SFX_URL, LIGHT_ELIM_SFX_LEGACY_URL], LIGHT_ELIM_SFX_START_SEC);
 }
 
 /** Plays the matching cross-off sound when a board value is eliminated — same

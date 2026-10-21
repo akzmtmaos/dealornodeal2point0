@@ -5,7 +5,7 @@ import { game, dom } from './game.js?v=100';
 import { setBriefcaseAmount, isBigValue, isLowValue, isHighestRemaining, triggerDangerFlash, triggerYellowFlash } from './helpers.js?v=101';
 import { caseInnerMarkup, flashTableShelves, clearShelfFlash } from './render.js?v=102';
 import { applyInteriorBg, getInteriorBgId, applyInteriorAmountStyling } from './customization.js?v=115';
-import { revealSoundLow, revealSoundHigh, playRevealSound, startTensionRoll, stopBankerRingLoop } from './sound.js?v=108';
+import { revealSoundLow, revealSoundHigh, playRevealSound, startTensionRoll, stopBankerRingLoop } from './sound.js?v=109';
 
 export function hideAll() {
   awaitingContinue = false;

@@ -5,7 +5,7 @@ import { game, dom } from './game.js?v=100';
 import { fmtDisplayBoard, fmtDisplayBriefcase, getCaseGridRows, formatNumber, setBriefcaseAmount } from './helpers.js?v=101';
 import { onCaseClick } from './cases.js?v=108';
 import { applyInteriorBg, getInteriorBgId, getBoardBgId, applyInteriorAmountStyling, wrapValueSquares } from './customization.js?v=115';
-import { boardEliminateSound } from './sound.js?v=108';
+import { boardEliminateSound } from './sound.js?v=109';
 
 export function renderAll() {
   renderGrid();

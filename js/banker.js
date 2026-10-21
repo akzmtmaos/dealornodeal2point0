@@ -8,7 +8,7 @@ import { revealCaseAnimated, updateStatus, hideAll } from './center-stage.js?v=1
 import { showFinalDecision } from './final.js?v=114';
 import { endGame } from './end.js?v=115';
 import { revealCounterDecision } from './counter.js?v=107';
-import { playBankerRing, startBankerRingLoop, stopBankerRingLoop } from './sound.js?v=108';
+import { playBankerRing, startBankerRingLoop, stopBankerRingLoop } from './sound.js?v=109';
 
 // Re-export for counter.js, which (like the original monolith) reaches the
 // final-decision screen through the banker module.
