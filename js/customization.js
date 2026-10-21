@@ -25,7 +25,7 @@ const BOARD_BG_OPTIONS = [
   { id: 'squares', label: 'Squares', class: 'board-bg-squares', swatch: 'repeating-linear-gradient(90deg,#fff8e0 0 10px,#d9a52e 10px 13px)' },
 ];
 
-let currentBoardBgId = localStorage.getItem('dnd_board_bg') || 'default';
+let currentBoardBgId = localStorage.getItem('dnd_board_bg') || 'squares';
 
 /** Returns the active prize-board background id ('default', 'squares', ...). */
 export function getBoardBgId() {
