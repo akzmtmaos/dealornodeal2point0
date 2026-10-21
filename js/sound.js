@@ -150,6 +150,20 @@ function revealSoundHighSynth() {
   scheduleTone(ctx, 'square', 233.08, t0 + 0.08, 0.32, 0.11, 116.54, 500);
 }
 
+/** One short ratchet tick for the offer strip — played every time a square's
+ *  character changes while the amount spins into place. The pitch climbs across
+ *  each 0-9 pass so the run has direction, and a sliver of noise keeps it
+ *  mechanical rather than musical. */
+export function offerStripTickSound(step = 0) {
+  if (!game.sfxEnabled || !(game.sfxVolumePercent > 0)) return;
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  const t = ctx.currentTime;
+  const freq = 540 + (step % 11) * 34;
+  scheduleTone(ctx, 'triangle', freq, t, 0.05, 0.07, null, 5200);
+  playNoiseBurst(ctx, t, 0.012, 0.035, 4200);
+}
+
 /** Plays the reveal sting matching the revealed value's tier (same split as
  *  the shelf flash: below 100K is the good/yellow one, 100K+ the red danger). */
 export function playRevealSound(value) {

@@ -2,6 +2,7 @@
 // Customization Picker (case interior + board value backgrounds)
 // ============================================
 import { game, dom } from './game.js?v=100';
+import { offerStripTickSound } from './sound.js?v=108';
 import { formatNumber } from './helpers.js?v=101';
 import { renderBoard } from './render.js?v=102';
 
@@ -88,6 +89,117 @@ const OFFER_DECISION_CELLS = {
 };
 const offerSquareObserver = new MutationObserver(() => renderOfferTileSquares());
 
+/* ---------- Squares: reveal sweep ---------- */
+/* The squares never rotate. On reveal a soft light line runs from the top of the
+   strip to the bottom while every square spins through its own character run and
+   lands on its own beat: 67,500 reads
+   [ ] 0,1,...,9, , ,0 then blank
+   [6] 0,1,...,9, , ,0,1,...,6
+   [,] 0,1,...,9, , ,0,1,...,9, ,
+   and so on. Letter states (DEAL / NO DEAL) spin A-Z instead. Every character
+   change runs a light line down that one square and clicks once; the container
+   itself never moves. */
+const DIGIT_ALPHABET = '0123456789,';
+const LETTER_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const REVEAL_TICK = 45;     // ms per spin step
+const REVEAL_LIMIT = 3000;  // failsafe: always hand the tile back
+const CELL_SWEEP_MS = 120;  // light line run per character change
+const CELL_SWEEP_IMAGE = 'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.9) 50%, rgba(255,255,255,0) 100%)';
+let offerFlipRunning = false;
+
+/** Runs the light line from the top of one square to its bottom. */
+function sweepOfferCell(cell) {
+  cell.animate([
+    { backgroundImage: CELL_SWEEP_IMAGE, backgroundRepeat: 'no-repeat', backgroundSize: '100% 55%', backgroundPosition: 'center -80%' },
+    { backgroundImage: CELL_SWEEP_IMAGE, backgroundRepeat: 'no-repeat', backgroundSize: '100% 55%', backgroundPosition: 'center 180%' },
+  ], { duration: CELL_SWEEP_MS, easing: 'linear' });
+}
+
+/** Sweeps each square and clicks as its character changes while the strip spins. */
+function animateOfferCells(tile) {
+  const cells = [...tile.children].filter(el => el.classList.contains('offer-sq-char'));
+  if (!cells.length) return;
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const isWord = cells.some(cell => /[A-Za-z]/.test(cell.textContent));
+  const alphabet = isWord ? LETTER_ALPHABET : DIGIT_ALPHABET;
+  // A-Z is a longer run than 0-9, so letters spin a little faster to keep the
+  // whole reveal around a second.
+  const tick = isWord ? 30 : REVEAL_TICK;
+  // Every square spins through one full pass before it may stop, so short runs
+  // still read as a spin rather than a flicker.
+  const firstLandStep = alphabet.length;
+  const spinners = cells.map(cell => {
+    let value = cell.querySelector('.sq-char-value');
+    const target = value ? value.textContent : ' ';
+    if (!value) {
+      // Blank squares spin too, then empty out again when they land.
+      value = document.createElement('span');
+      value.className = 'sq-char-value';
+      value.style.fontSize = '0.85em';
+      value.style.padding = '4px 2px';
+      cell.appendChild(value);
+    }
+    return { cell, value, target, spun: false };
+  });
+
+  offerFlipRunning = true;
+  let step = 0;
+  let remaining = spinners.length;
+  let done = false;
+
+  const finish = () => {
+    if (done) return;
+    done = true;
+    clearInterval(timer);
+    clearTimeout(failsafe);
+    spinners.forEach(({ value, target }) => {
+      if (target === ' ') value.remove();
+      else value.textContent = target;
+    });
+    offerFlipRunning = false;
+    // Re-sync in case something wrote to the tile while it was spinning.
+    renderOfferTileSquares();
+  };
+
+  const timer = setInterval(() => {
+    let changed = false;
+    spinners.forEach(s => {
+      if (s.spun) return;
+      const ch = alphabet[step % alphabet.length];
+      if (step >= firstLandStep) {
+        const idx = alphabet.indexOf(s.target);
+        // Blanks land one step later so they clear after the line passes; a
+        // character outside the run (like '.') lands after a second pass.
+        const landing = s.target === ' '
+          ? step >= firstLandStep + 1
+          : idx === -1
+            ? step >= firstLandStep * 2
+            : ch === s.target;
+        if (landing) {
+          if (s.target === ' ') s.value.remove();
+          else s.value.textContent = s.target;
+          s.spun = true;
+          remaining--;
+          changed = true;
+          sweepOfferCell(s.cell);
+          return;
+        }
+      }
+      if (s.value.textContent !== ch) {
+        s.value.textContent = ch;
+        changed = true;
+        sweepOfferCell(s.cell);
+      }
+    });
+    // One click per strip change, not one per square.
+    if (changed) offerStripTickSound(step);
+    step++;
+    if (remaining <= 0) finish();
+  }, tick);
+
+  const failsafe = setTimeout(finish, REVEAL_LIMIT);
+}
+
 /** Re-renders the offer tile's amount into per-character yellow squares (Squares mode).
  *  Before the first offer is revealed the tile has no text at all, but it still
  *  shows the same square strip filled with blank cells, so the squares container
@@ -95,6 +207,7 @@ const offerSquareObserver = new MutationObserver(() => renderOfferTileSquares())
 function renderOfferTileSquares() {
   const tile = dom.bankerOfferDisplay;
   if (!tile) return;
+  if (offerFlipRunning) return; // the flip owns the cells until it finishes
   const text = tile.textContent.replace(/\s/g, '');
   const squaresMode = getBoardBgId() === 'squares';
   const isAmount = !!text && OFFER_SQUARES_TEXT.test(text);
@@ -135,6 +248,9 @@ function renderOfferTileSquares() {
     return value ? value.textContent : ' ';
   });
   if (renderedChars.length === chars.length && renderedChars.join('') === chars.join('')) return;
+  // Writers assign textContent, which wipes the cells before this runs, so the
+  // grid left behind is remembered on the tile itself rather than read from DOM.
+  const hadGrid = tile.dataset.squaresApplied === '1';
   tile.dataset.squaresApplied = '1';
   tile.classList.add('offer-squares');
   tile.textContent = '';
@@ -153,6 +269,9 @@ function renderOfferTileSquares() {
     }
     tile.appendChild(span);
   }
+  // A fresh amount or decision word sweeps the strip instead of flipping the
+  // whole container.
+  if (hadGrid && (isAmount || decisionCells)) animateOfferCells(tile);
 }
 
 /** Wires up the offer-tile squares sync. Called once at startup. */

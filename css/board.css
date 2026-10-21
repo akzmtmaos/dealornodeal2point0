@@ -576,3 +576,12 @@
     -webkit-text-stroke:0.8px #1a1608;
   }
 
+
+/* ---------- Squares: reveal sweep ---------- */
+/* The squares themselves never rotate. On reveal js/customization.js spins each
+   square through its characters and runs a short light line down that one square
+   on every change (Web Animations, so nothing is left behind on the cell). The
+   whole-tile tileFlip is switched off in this mode so only the lines move. */
+.banker-offer-tile.offer-squares.flip-anim{
+  animation:none;
+}

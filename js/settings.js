@@ -6,7 +6,7 @@ import { MIN_CASE_COUNT, MAX_CASE_COUNT } from './game.js?v=100';
 import { logEvent, fmtDisplayBoard } from './helpers.js?v=101';
 import { renderGrid, renderYourCase } from './render.js?v=102';
 import { refreshCurrencyDisplay } from './render.js?v=102';
-import { applySfxLevel } from './sound.js?v=105';
+import { applySfxLevel } from './sound.js?v=108';
 import { newGame } from './init.js?v=109';
 
 dom.settingsGear.addEventListener('click', (e) => {
