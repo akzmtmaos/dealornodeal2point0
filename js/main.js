@@ -10,7 +10,7 @@ import './banker.js?v=108';
 import './counter.js?v=107';
 import './prize-board.js?v=111';
 import './suggest.js?v=113';
-import './customization.js?v=104';
+import './customization.js?v=107';
 
 // Import init for startup
 import { dom } from './game.js?v=100';

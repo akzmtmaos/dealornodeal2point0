@@ -76,44 +76,50 @@ export function wrapValueSquares(el, pad) {
    with the same square-grid cells the prize board uses: one yellow square
    per character ($ and commas included), blanks padded to the 7-slot board
    width — e.g. [ ][1][,][5][0][0]. A MutationObserver keeps the cells in
-   sync with every writer of the tile (offer reveal, currency refresh, DEAL
-   / NO DEAL, counter offer); non-numeric states keep their normal designs. */
+   sync with every writer of the tile (offer reveal, currency refresh, DEAL /
+   NO DEAL, counter offer); the counter-offer markup keeps its normal design. */
 const OFFER_SQUARES_TEXT = /^[0-9,$.\s]+$/;
+/* Decision words keep their own cell layout in the strip:
+   DEAL    -> [ ][ ][D][E][A][L][ ]  (centered)
+   NO DEAL -> [N][O][ ][D][E][A][L]  (the word gap stays a blank cell) */
+const OFFER_DECISION_CELLS = {
+  DEAL: ['D', 'E', 'A', 'L'],
+  NODEAL: ['N', 'O', ' ', 'D', 'E', 'A', 'L'],
+};
 const offerSquareObserver = new MutationObserver(() => renderOfferTileSquares());
 
-/** Re-renders the offer tile's amount into per-character yellow squares (Squares mode). */
+/** Re-renders the offer tile's amount into per-character yellow squares (Squares mode).
+ *  Before the first offer is revealed the tile has no text at all, but it still
+ *  shows the same square strip filled with blank cells, so the squares container
+ *  is on screen from the start of the game instead of appearing only on reveal. */
 function renderOfferTileSquares() {
   const tile = dom.bankerOfferDisplay;
   if (!tile) return;
-  const text = tile.textContent;
-  const active = getBoardBgId() === 'squares' && !!text && OFFER_SQUARES_TEXT.test(text);
-  if (!active) {
-    // Leaving squares mode (or a non-amount state like "NO DEAL"): if the tile
-    // still shows cells from a previous amount, restore its normal look.
+  const text = tile.textContent.replace(/\s/g, '');
+  const squaresMode = getBoardBgId() === 'squares';
+  const isAmount = !!text && OFFER_SQUARES_TEXT.test(text);
+  const decisionCells = OFFER_DECISION_CELLS[text];
+  // Empty tile = no offer revealed yet: show the blank grid, not nothing.
+  const showGrid = squaresMode && (isAmount || !!decisionCells || text === '');
+  if (!showGrid) {
+    // Leaving squares mode (or a state that is not an amount, decision word or
+    // blank tile, e.g. the counter offer): restore the tile's normal look.
+    const cells = [...tile.querySelectorAll('.offer-sq-char .sq-char-value')].map(v => v.textContent);
     if (tile.dataset.squaresApplied === '1') {
       delete tile.dataset.squaresApplied;
       tile.classList.remove('offer-squares');
-      if (OFFER_SQUARES_TEXT.test(text)) {
-        tile.textContent = [...tile.querySelectorAll('.offer-sq-char .sq-char-value')]
-          .map(v => v.textContent)
-          .join('');
-      }
+      if (cells.length) tile.textContent = cells.join('');
     } else {
       tile.classList.remove('offer-squares');
     }
     return;
   }
-  const cells = [...tile.querySelectorAll('.offer-sq-char .sq-char-value')].map(v => v.textContent);
-  const alreadyCells = cells.length > 0;
-  const sig = text.replace(/\s/g, '');
-  if (alreadyCells && cells.join('') === sig) return;
-  tile.dataset.squaresApplied = '1';
-  tile.classList.add('offer-squares');
-  tile.textContent = '';
-  // Center the amount in the 7-slot strip; the odd blank goes on the left
-  // (e.g. 55,500 -> [ ][5][5][,][5][0][0], 299 -> [ ][ ][2][9][9][ ][ ]). Amounts
-  // of 7+ characters (like 1,000,000) render at natural width with no padding.
-  const chars = sig.split('');
+  // Target cell row: amount, decision word, or seven blanks before the first
+  // offer. Anything shorter than the 7-slot strip is centered, with the odd
+  // blank on the left (55,500 -> [ ][5][5][,][5][0][0], 299 -> [ ][ ][2][9][9][ ][ ],
+  // DEAL -> [ ][ ][D][E][A][L][ ]). Amounts of 7+ characters (like 1,000,000)
+  // render at natural width with no padding.
+  const chars = isAmount ? text.split('') : decisionCells ? [...decisionCells] : [];
   if (chars.length < SQ_FULL_WIDTH) {
     const padTotal = SQ_FULL_WIDTH - chars.length;
     const padLeft = Math.ceil(padTotal / 2);
@@ -121,6 +127,18 @@ function renderOfferTileSquares() {
     for (let i = 0; i < padLeft; i++) chars.unshift(' ');
     for (let i = 0; i < padRight; i++) chars.push(' ');
   }
+  // Skip the rebuild when the tile already shows exactly these cells — keeps the
+  // observer from looping on its own mutations.
+  const rendered = [...tile.children].filter(el => el.classList.contains('offer-sq-char'));
+  const renderedChars = rendered.map(sp => {
+    const value = sp.querySelector('.sq-char-value');
+    return value ? value.textContent : ' ';
+  });
+  if (renderedChars.length === chars.length && renderedChars.join('') === chars.join('')) return;
+  tile.dataset.squaresApplied = '1';
+  tile.classList.add('offer-squares');
+  tile.textContent = '';
+  tile.style.padding = '4px 2px';
   for (const ch of chars) {
     const span = document.createElement('span');
     span.className = 'offer-sq-char' + (ch === ' ' ? ' sq-char-empty' : '');
@@ -132,7 +150,6 @@ function renderOfferTileSquares() {
       // Make font size a bit small in offer container
       value.style.fontSize = '0.85em';
       value.style.padding = '4px 2px';
-      tile.style.padding = '4px 2px';
     }
     tile.appendChild(span);
   }
