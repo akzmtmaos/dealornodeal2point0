@@ -577,6 +577,13 @@
   }
 
 
+/* Board styles without the square strip: the case count the tile reports when
+   no offer is showing, as plain text. */
+.banker-offer-tile.offer-cases-plain{
+  font-size:1.35rem;
+  letter-spacing:0.08em;
+}
+
 /* ---------- Squares: reveal sweep ---------- */
 /* The squares themselves never rotate. On reveal js/customization.js spins each
    square through its characters and runs a short light line down that one square

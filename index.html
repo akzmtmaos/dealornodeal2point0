@@ -13,7 +13,10 @@
 
   <div class="marquee">
     <img class="deal-logo" src="logo.png" alt="Deal or No Deal">
-    <div class="subtitle" id="statusLine">Pick a briefcase below to hold as <b>your case</b>.</div>
+    <!-- The round status now lives in the banker offer strip (#bankerOfferDisplay),
+         which shows [#][ ][C][A][S][E][S]. Kept in the DOM (hidden) so the existing
+         status writers keep working without a null check. -->
+    <div class="subtitle" id="statusLine" style="display:none;"></div>
   </div>
 
   <div class="game-layout">
@@ -47,15 +50,18 @@
 
 <div class="spotlight-backdrop" id="spotlightBackdrop"></div><div class="danger-flash" id="dangerFlash"></div>
 
-<button class="settings-gear" id="settingsGear" title="Settings" aria-label="Settings">⚙</button>
-<button class="settings-gear pb-select-btn" id="pbSelectBtn" title="Prize Board Selection" aria-label="Prize Board Selection" style="top:56px;">🏆</button>
-<button class="board-save-btn" id="boardSaveBtn" title="Save to Prize Board Selection" style="top:98px;">💾</button>
-<button class="settings-gear pb-select-btn" id="suggestBtn" title="Suggest Elimination Order" aria-label="Suggest Elimination Order" style="top:140px;">🎲</button>
-<button class="emoji-btn" id="editToggle" title="Edit Values" style="top:182px;">✎</button>
-<button class="emoji-btn" id="saveValuesBtn" title="Save Values" style="top:224px;">💾</button>
-<button class="emoji-btn" id="resetValuesBtn" title="Reset" style="top:266px;">↻</button>
-<button class="emoji-btn" id="shuffleBtn" title="Shuffle" style="top:308px;">🔀</button>
-<button class="settings-gear pb-select-btn" id="bgPickerBtn" title="Customization" aria-label="Customization" style="top:350px;">🎨</button>
+<div class="tool-dock" id="toolDock">
+  <button class="settings-gear" id="settingsGear" title="Settings" aria-label="Settings">⚙</button>
+  <button class="settings-gear pb-select-btn" id="pbSelectBtn" title="Prize Board Selection" aria-label="Prize Board Selection">🏆</button>
+  <button class="board-save-btn" id="boardSaveBtn" title="Save to Prize Board Selection">💾</button>
+  <button class="settings-gear pb-select-btn" id="suggestBtn" title="Suggest Elimination Order" aria-label="Suggest Elimination Order">🎲</button>
+  <button class="settings-gear pb-select-btn" id="randomizer2Btn" title="Randomizer Beta Test 2 — highlight what to open" aria-label="Randomizer Beta Test 2">🎯</button>
+  <button class="emoji-btn" id="editToggle" title="Edit Values">✎</button>
+  <button class="emoji-btn" id="saveValuesBtn" title="Save Values">💾</button>
+  <button class="emoji-btn" id="resetValuesBtn" title="Reset">↻</button>
+  <button class="emoji-btn" id="shuffleBtn" title="Shuffle">🔀</button>
+  <button class="settings-gear pb-select-btn" id="bgPickerBtn" title="Customization" aria-label="Customization">🎨</button>
+</div>
 <div class="settings-panel" id="settingsPanel" style="display:none;">
   <div class="settings-title">Settings</div>
   <label class="settings-row">
@@ -267,7 +273,7 @@
     } else {
       var s = document.createElement('script');
       s.type = 'module';
-      s.src = 'js/main.js?v=29';
+      s.src = 'js/main.js?v=31';
       document.body.appendChild(s);
     }
   })();

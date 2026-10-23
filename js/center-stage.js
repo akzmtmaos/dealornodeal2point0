@@ -3,8 +3,8 @@
 // ============================================
 import { game, dom } from './game.js?v=100';
 import { setBriefcaseAmount, isBigValue, isLowValue, isHighestRemaining, triggerDangerFlash, triggerYellowFlash } from './helpers.js?v=101';
-import { caseInnerMarkup, flashTableShelves, clearShelfFlash } from './render.js?v=102';
-import { applyInteriorBg, getInteriorBgId, applyInteriorAmountStyling } from './customization.js?v=115';
+import { caseInnerMarkup, flashTableShelves, clearShelfFlash } from './render.js?v=104';
+import { applyInteriorBg, getInteriorBgId, applyInteriorAmountStyling } from './customization.js?v=121';
 import { revealSoundLow, revealSoundHigh, playRevealSound, startTensionRoll, stopBankerRingLoop } from './sound.js?v=109';
 
 export function hideAll() {
@@ -96,7 +96,15 @@ export function revealCaseAnimated(n, label, callback, dangerAware, onCancel, re
 
   function revealDrama() {
     dom.centerCase.classList.add('show-amount');
-    if (isDanger) {
+    // A verdict reveal flashes with the decision, not the amount: a No Deal that
+    // ended badly goes red even when the case held pennies, and a good one stays
+    // warm even when the case held big money. Every other reveal keeps the value
+    // tiers.
+    if (revealSoundOverride === 'bad') {
+      triggerDangerFlash();
+    } else if (revealSoundOverride === 'good') {
+      triggerYellowFlash();
+    } else if (isDanger) {
       triggerDangerFlash();
     } else if (isLow) {
       triggerYellowFlash();

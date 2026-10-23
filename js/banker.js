@@ -3,9 +3,9 @@
 // ============================================
 import { game, dom } from './game.js?v=100';
 import { fmt, fmtDisplayBoard, logEvent, remainingAmountValues } from './helpers.js?v=101';
-import { renderGrid, renderAll, eliminateBoardValue } from './render.js?v=102';
-import { revealCaseAnimated, updateStatus, hideAll } from './center-stage.js?v=103';
-import { showFinalDecision } from './final.js?v=114';
+import { renderGrid, renderAll, eliminateBoardValue } from './render.js?v=104';
+import { revealCaseAnimated, updateStatus, hideAll } from './center-stage.js?v=106';
+import { showFinalDecision } from './final.js?v=117';
 import { endGame } from './end.js?v=115';
 import { revealCounterDecision } from './counter.js?v=107';
 import { playBankerRing, startBankerRingLoop, stopBankerRingLoop } from './sound.js?v=109';

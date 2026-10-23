@@ -80,6 +80,7 @@ export const dom = {
   soundToggle: $('soundToggle'),
   sfxVolumeInput: $('sfxVolumeInput'),
   suggestBtn: $('suggestBtn'),
+  randomizer2Btn: $('randomizer2Btn'),
   suggestPanel: $('suggestPanel'),
   suggestBody: $('suggestBody'),
   suggestRegenBtn: $('suggestRegenBtn'),

@@ -4,7 +4,8 @@
 import { game, dom } from './game.js?v=100';
 import { fmtDisplayBoard, fmtDisplayBriefcase, getCaseGridRows, formatNumber, setBriefcaseAmount } from './helpers.js?v=101';
 import { onCaseClick } from './cases.js?v=108';
-import { applyInteriorBg, getInteriorBgId, getBoardBgId, applyInteriorAmountStyling, wrapValueSquares } from './customization.js?v=115';
+import { applyInteriorBg, getInteriorBgId, getBoardBgId, applyInteriorAmountStyling, wrapValueSquares, refreshCaseCountStrip } from './customization.js?v=121';
+import { refreshRandomizer2 } from './randomizer2.js?v=2';
 import { boardEliminateSound } from './sound.js?v=109';
 
 export function renderAll() {
@@ -120,6 +121,12 @@ export function renderGrid() {
   });
   // Re-apply the current interior background to newly created case-interior elements
   applyInteriorBg(getInteriorBgId());
+  // The offer strip doubles as the status line, so keep its case count current
+  // every time the grid is rebuilt (a case opened, a new game, ...).
+  refreshCaseCountStrip();
+  // Randomizer Beta Test 2 marks cases on the buttons themselves, so the marks
+  // have to be re-applied to the fresh buttons after every rebuild.
+  refreshRandomizer2();
 }
 
 export function renderBoard() {

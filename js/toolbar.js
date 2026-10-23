@@ -3,7 +3,7 @@
 // ============================================
 import { game, dom } from './game.js?v=100';
 import { getValuesForCount } from './helpers.js?v=101';
-import { renderBoard, renderAll, updateToolbar } from './render.js?v=102';
+import { renderBoard, renderAll, updateToolbar } from './render.js?v=104';
 import { assignCases } from './init.js?v=109';
 
 function pulseGrid() {

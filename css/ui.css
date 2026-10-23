@@ -390,3 +390,71 @@
     font-family:'Inter',sans-serif;
   }
 
+
+  /* ---------- Floating tools: one row along the bottom ---------- */
+  /* These used to be pinned down the right edge with inline top offsets. They
+     now live in one pill-shaped dock along the bottom edge of the screen. */
+  .tool-dock{
+    position:fixed;
+    left:50%;
+    bottom:14px;
+    transform:translateX(-50%);
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:6px 8px;
+    border-radius:999px;
+    background:rgba(10,12,16,0.55);
+    border:1px solid rgba(139,147,168,0.18);
+    box-shadow:0 6px 20px rgba(0,0,0,0.4);
+    backdrop-filter:blur(6px);
+    max-width:calc(100vw - 16px);
+    overflow-x:auto;
+    scrollbar-width:none;
+    z-index:90;
+  }
+  .tool-dock::-webkit-scrollbar{display:none;}
+  /* Inside the dock the buttons flow in a row instead of being position:fixed. */
+  .tool-dock > button{
+    position:static;
+    top:auto;right:auto;bottom:auto;left:auto;
+    flex:0 0 auto;
+  }
+
+  /* ---------- Randomizer Beta Test 2: case highlights ---------- */
+  /* The randomizer marks the briefcases themselves instead of listing numbers:
+     cyan rings are the cases to open this round, the gold ring is the suggested
+     "your case" before one is chosen. */
+  .briefcase.rand-2-pick{
+    border-radius:12px;
+    outline:3px solid rgba(52,211,255,0.95);
+    outline-offset:3px;
+    z-index:2;
+    animation:rand2PickPulse 1.25s ease-in-out infinite;
+  }
+  @keyframes rand2PickPulse{
+    0%,100%{outline-color:rgba(52,211,255,0.95);box-shadow:0 0 12px 1px rgba(52,211,255,0.45);}
+    50%{outline-color:rgba(52,211,255,0.4);box-shadow:0 0 22px 4px rgba(52,211,255,0.75);}
+  }
+  .briefcase.rand-2-your-case{
+    border-radius:12px;
+    outline:3px solid rgba(255,207,77,0.95);
+    outline-offset:3px;
+    z-index:2;
+    animation:rand2YourCasePulse 1.25s ease-in-out infinite;
+  }
+  @keyframes rand2YourCasePulse{
+    0%,100%{outline-color:rgba(255,207,77,0.95);box-shadow:0 0 14px 2px rgba(255,207,77,0.5);}
+    50%{outline-color:rgba(255,207,77,0.45);box-shadow:0 0 24px 5px rgba(255,207,77,0.8);}
+  }
+  /* The dock button shows when the mode is on. */
+  #randomizer2Btn.active{
+    color:#34d3ff;
+    border-color:rgba(52,211,255,0.75);
+    background:rgba(52,211,255,0.14);
+    box-shadow:0 0 12px rgba(52,211,255,0.45);
+  }
+  @media (prefers-reduced-motion: reduce){
+    .briefcase.rand-2-pick,
+    .briefcase.rand-2-your-case{animation:none;box-shadow:none;}
+  }

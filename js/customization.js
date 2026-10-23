@@ -4,7 +4,7 @@
 import { game, dom } from './game.js?v=100';
 import { offerStripTickSound } from './sound.js?v=109';
 import { formatNumber } from './helpers.js?v=101';
-import { renderBoard } from './render.js?v=102';
+import { renderBoard } from './render.js?v=104';
 
 /* ---------- Case Interior Background ---------- */
 const BG_OPTIONS = [
@@ -87,7 +87,17 @@ const OFFER_DECISION_CELLS = {
   DEAL: ['D', 'E', 'A', 'L'],
   NODEAL: ['N', 'O', ' ', 'D', 'E', 'A', 'L'],
 };
+/* The strip doubles as the game's status line: with nothing to announce it shows
+   how many briefcases are still in play as [#][ ][C][A][S][E][S] (a two-digit
+   count simply adds a cell). When the strip is reset for an offer — or a DEAL /
+   NO DEAL word is written to it — the count comes back by itself, and a decision
+   word holds the strip for a moment first so the two never collide. */
+const CASE_COUNT_LABEL = 'CASES';
+const DECISION_HOLD_MS = 3000;
 const offerSquareObserver = new MutationObserver(() => renderOfferTileSquares());
+let lastCaseCountText = null; // strip textContent while it shows the count, else null
+let lastStripKind = null;     // 'amount' | 'decision' | 'status' | null
+let decisionRevertTimer = null;
 
 /* ---------- Squares: reveal sweep ---------- */
 /* The squares never rotate. On reveal a soft light line runs from the top of the
@@ -200,23 +210,97 @@ function animateOfferCells(tile) {
   const failsafe = setTimeout(finish, REVEAL_LIMIT);
 }
 
+/** How many briefcases still have to be opened this round — the same count the
+ *  round prompt used to show ("open 5 more cases"), so it drops by one every
+ *  time a case is opened and restarts at the round's size when the next round
+ *  begins.
+ *
+ *  The count is held rather than read straight off the game: finishing a round
+ *  resets openedInRound to 0 a few seconds before roundIndex moves on, so a
+ *  plain subtraction would jump from 0 back to the round's size while the
+ *  banker is calling. Only a drop is taken from the game state, and a new count
+ *  is adopted when the round (or the game) really changes. */
+let countRound = null; // round the held count belongs to
+let countLeft = null;  // the number the strip shows
+
+function remainingCaseCount() {
+  const need = Math.max(0, (game.schedule[game.roundIndex] || 0) - game.openedInRound);
+  const freshGame = game.openedCases.size === 0 && game.openedInRound === 0;
+  if (freshGame || countRound !== game.roundIndex || countLeft === null || need < countLeft) {
+    countRound = game.roundIndex;
+    countLeft = need;
+  }
+  return countLeft;
+}
+
+/** The status the strip shows when it has no offer to display: '6CASES'. */
+function caseCountText() {
+  return String(remainingCaseCount()) + CASE_COUNT_LABEL;
+}
+
+/** Same status as a cell row: [6][ ][C][A][S][E][S] (a two-digit count adds a cell). */
+function caseCountCells() {
+  return [...String(remainingCaseCount()), ' ', ...CASE_COUNT_LABEL];
+}
+
+/** Clears the pending "decision word has had its moment" timer. */
+function clearDecisionRevert() {
+  if (decisionRevertTimer === null) return;
+  clearTimeout(decisionRevertTimer);
+  decisionRevertTimer = null;
+}
+
+/** DEAL / NO DEAL keeps the strip for a few seconds, then the strip animates
+ *  back to the case count so the two never fight over the same squares. */
+function scheduleDecisionRevert() {
+  clearDecisionRevert();
+  decisionRevertTimer = setTimeout(() => {
+    decisionRevertTimer = null;
+    const tile = dom.bankerOfferDisplay;
+    if (!tile || offerFlipRunning) return;
+    // Something newer (a counter offer, a fresh amount) took the strip — leave it.
+    if (!OFFER_DECISION_CELLS[tile.textContent.replace(/\s/g, '')]) return;
+    tile.classList.remove('no-deal');
+    tile.textContent = '';
+    renderOfferTileSquares();
+  }, DECISION_HOLD_MS);
+}
+
+/** Keeps the case-count strip current. Cheap: exported for the render pass, which
+ *  runs on every case open, and does nothing while an offer owns the tile. */
+export function refreshCaseCountStrip() {
+  const tile = dom.bankerOfferDisplay;
+  if (!tile || offerFlipRunning) return;
+  if (tile.textContent.replace(/\s/g, '') !== lastCaseCountText) return;
+  renderOfferTileSquares();
+}
+
 /** Re-renders the offer tile's amount into per-character yellow squares (Squares mode).
- *  Before the first offer is revealed the tile has no text at all, but it still
- *  shows the same square strip filled with blank cells, so the squares container
- *  is on screen from the start of the game instead of appearing only on reveal. */
+ *  Before the first offer is revealed the tile has no text at all, so the strip
+ *  reports the briefcases still in play instead of sitting empty. */
 function renderOfferTileSquares() {
   const tile = dom.bankerOfferDisplay;
   if (!tile) return;
   if (offerFlipRunning) return; // the flip owns the cells until it finishes
-  const text = tile.textContent.replace(/\s/g, '');
+  const rawText = tile.textContent.replace(/\s/g, '');
+  // The strip showing the case count is the tile's "empty" state: normalise it
+  // away so every branch below behaves as if no offer had been written yet.
+  const statusShown = lastCaseCountText !== null && rawText === lastCaseCountText;
+  const text = statusShown ? '' : rawText;
   const squaresMode = getBoardBgId() === 'squares';
   const isAmount = !!text && OFFER_SQUARES_TEXT.test(text);
   const decisionCells = OFFER_DECISION_CELLS[text];
-  // Empty tile = no offer revealed yet: show the blank grid, not nothing.
-  const showGrid = squaresMode && (isAmount || !!decisionCells || text === '');
+  // While the banker is on the line the strip is either about to show an offer
+  // or a decision, so the count gets out of the way and the strip sits blank
+  // instead of holding onto the finished round's 0 CASES.
+  const bankIsCalling = game.state === 'offer';
+  const statusCells = text === '' && !bankIsCalling ? caseCountCells() : null;
+  const blankStrip = text === '' && bankIsCalling;
+  // Empty tile = no offer to show: report the case count, not nothing.
+  const showGrid = squaresMode && (isAmount || !!decisionCells || !!statusCells || blankStrip);
   if (!showGrid) {
     // Leaving squares mode (or a state that is not an amount, decision word or
-    // blank tile, e.g. the counter offer): restore the tile's normal look.
+    // status, e.g. the counter offer): restore the tile's normal look.
     const cells = [...tile.querySelectorAll('.offer-sq-char .sq-char-value')].map(v => v.textContent);
     if (tile.dataset.squaresApplied === '1') {
       delete tile.dataset.squaresApplied;
@@ -225,14 +309,29 @@ function renderOfferTileSquares() {
     } else {
       tile.classList.remove('offer-squares');
     }
+    lastStripKind = null;
+    // Not in Squares mode: there is no strip, so the count shows as plain text.
+    if (statusCells) {
+      const countLabel = String(remainingCaseCount()) + ' ' + CASE_COUNT_LABEL;
+      if (tile.textContent !== countLabel) {
+        tile.textContent = countLabel;
+        tile.classList.add('offer-cases-plain');
+        lastStripKind = 'status';
+      }
+      lastCaseCountText = countLabel.replace(/\s/g, '');
+    } else {
+      tile.classList.remove('offer-cases-plain');
+      if (blankStrip && tile.textContent !== '') tile.textContent = '';
+      lastCaseCountText = null;
+    }
     return;
   }
-  // Target cell row: amount, decision word, or seven blanks before the first
-  // offer. Anything shorter than the 7-slot strip is centered, with the odd
-  // blank on the left (55,500 -> [ ][5][5][,][5][0][0], 299 -> [ ][ ][2][9][9][ ][ ],
+  // Target cell row: amount, decision word, or the case count. Anything shorter
+  // than the 7-slot strip is centered, with the odd blank on the left
+  // (55,500 -> [ ][5][5][,][5][0][0], 299 -> [ ][ ][2][9][9][ ][ ],
   // DEAL -> [ ][ ][D][E][A][L][ ]). Amounts of 7+ characters (like 1,000,000)
   // render at natural width with no padding.
-  const chars = isAmount ? text.split('') : decisionCells ? [...decisionCells] : [];
+  const chars = isAmount ? text.split('') : decisionCells ? [...decisionCells] : statusCells ? [...statusCells] : [];
   if (chars.length < SQ_FULL_WIDTH) {
     const padTotal = SQ_FULL_WIDTH - chars.length;
     const padLeft = Math.ceil(padTotal / 2);
@@ -240,6 +339,7 @@ function renderOfferTileSquares() {
     for (let i = 0; i < padLeft; i++) chars.unshift(' ');
     for (let i = 0; i < padRight; i++) chars.push(' ');
   }
+  lastCaseCountText = statusCells ? caseCountText() : null;
   // Skip the rebuild when the tile already shows exactly these cells — keeps the
   // observer from looping on its own mutations.
   const rendered = [...tile.children].filter(el => el.classList.contains('offer-sq-char'));
@@ -248,11 +348,40 @@ function renderOfferTileSquares() {
     return value ? value.textContent : ' ';
   });
   if (renderedChars.length === chars.length && renderedChars.join('') === chars.join('')) return;
+  // A case was just opened: only the leading number cells change, so the count
+  // ticks down by one step — the number cell takes its new digit with a single
+  // light-line pass and CASES never moves. No 0-9 run here; the full spin stays
+  // reserved for the banker offer display.
+  const digitCount = statusCells ? String(remainingCaseCount()).length : 0;
+  const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const oldDigits = renderedChars.slice(0, digitCount).join('');
+  const newDigits = chars.slice(0, digitCount).join('');
+  if (statusCells && lastStripKind === 'status' && !reducedMotion &&
+      renderedChars.length === chars.length &&
+      renderedChars.slice(digitCount).join('') === chars.slice(digitCount).join('') &&
+      Number(oldDigits) > Number(newDigits)) {
+    const digitCells = rendered.slice(0, digitCount);
+    digitCells.forEach((cell, i) => {
+      let value = cell.querySelector('.sq-char-value');
+      if (!value) {
+        value = document.createElement('span');
+        value.className = 'sq-char-value';
+        value.style.fontSize = '0.85em';
+        value.style.padding = '4px 2px';
+        cell.appendChild(value);
+      }
+      value.textContent = chars[i];
+      sweepOfferCell(cell);
+    });
+    offerStripTickSound(0);
+    return;
+  }
   // Writers assign textContent, which wipes the cells before this runs, so the
   // grid left behind is remembered on the tile itself rather than read from DOM.
   const hadGrid = tile.dataset.squaresApplied === '1';
   tile.dataset.squaresApplied = '1';
   tile.classList.add('offer-squares');
+  tile.classList.remove('offer-cases-plain');
   tile.textContent = '';
   tile.style.padding = '4px 2px';
   for (const ch of chars) {
@@ -270,8 +399,14 @@ function renderOfferTileSquares() {
     tile.appendChild(span);
   }
   // A fresh amount or decision word sweeps the strip instead of flipping the
-  // whole container.
-  if (hadGrid && (isAmount || decisionCells)) animateOfferCells(tile);
+  // whole container. The count lands quietly on every case open, and spins back
+  // only when it is taking the strip over from a decision word.
+  const spin = isAmount || decisionCells || (statusCells && lastStripKind === 'decision');
+  lastStripKind = isAmount ? 'amount' : decisionCells ? 'decision' : 'status';
+  if (hadGrid && spin) animateOfferCells(tile);
+  // A decision word owns the strip for a moment, then it hands it back.
+  if (decisionCells) scheduleDecisionRevert();
+  else clearDecisionRevert();
 }
 
 /** Wires up the offer-tile squares sync. Called once at startup. */
