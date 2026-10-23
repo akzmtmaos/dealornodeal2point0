@@ -1,13 +1,14 @@
 // ============================================
 // Settings gear
 // ============================================
-import { game, dom } from './game.js?v=100';
-import { MIN_CASE_COUNT, MAX_CASE_COUNT } from './game.js?v=100';
-import { logEvent, fmtDisplayBoard } from './helpers.js?v=101';
-import { renderGrid, renderYourCase } from './render.js?v=104';
-import { refreshCurrencyDisplay } from './render.js?v=104';
+import { game, dom } from './game.js?v=101';
+import { MIN_CASE_COUNT, MAX_CASE_COUNT } from './game.js?v=101';
+import { logEvent, fmtDisplayBoard } from './helpers.js?v=120';
+import { renderGrid, renderYourCase } from './render.js?v=107';
+import { refreshCurrencyDisplay } from './render.js?v=107';
 import { applySfxLevel } from './sound.js?v=109';
 import { newGame } from './init.js?v=109';
+import { setModelsEnabled } from './models.js?v=1';
 
 dom.settingsGear.addEventListener('click', (e) => {
   e.stopPropagation();
@@ -186,6 +187,12 @@ dom.gameLogEnabledToggle.addEventListener('change', () => {
 
 dom.hostModeToggle.addEventListener('change', () => {
   game.hostMode = dom.hostModeToggle.checked;
+});
+
+// The models flag and its pictures are owned by models.js, which saves them the
+// moment they change rather than on Save.
+dom.customModelsToggle.addEventListener('change', () => {
+  setModelsEnabled(dom.customModelsToggle.checked);
 });
 
 /** Shows/hides the bottom-right log panel to match the current setting. */

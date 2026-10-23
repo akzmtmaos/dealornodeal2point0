@@ -1,7 +1,7 @@
 // ============================================
 // Helpers — formatting, logging, value checks
 // ============================================
-import { game, dom, STANDARD_VALUES } from './game.js?v=100';
+import { game, dom, STANDARD_VALUES } from './game.js?v=101';
 
 export function formatNumber(v) {
   if (v < 1) return v.toFixed(2).replace(/^0(?=\.)/, '');
@@ -126,6 +126,30 @@ export function getCaseGridRows(count) {
     nextStart = nextStart - 1;
     remaining -= rowCount;
     rowIdx++;
+  }
+  return rows;
+}
+
+/** Row plan used while Custom Models is on: fewer cases per row so each case
+ *  and its picture square fit without the shelf scrolling. Rows are as even as
+ *  possible and still run from the highest case numbers at the top down. */
+export function getModelGridRows(count, perRow) {
+  const rows = [];
+  const rowCount = Math.max(1, Math.ceil(count / Math.max(1, perRow)));
+  const base = Math.floor(count / rowCount);
+  const extra = count % rowCount;
+  // The spare cases go to alternate rows (0, 2, 4, ...) so the shelves keep the
+  // staggered 7-6-7-6 pyramid instead of two long rows on top: 26 cases become
+  // 20-26 / 14-19 / 7-13 / 1-6.
+  const extraRows = new Set();
+  for (let i = 0; i < rowCount && extraRows.size < extra; i += 2) extraRows.add(i);
+  for (let i = 1; i < rowCount && extraRows.size < extra; i += 2) extraRows.add(i);
+  let nextStart = count;
+  for (let i = 0; i < rowCount; i++) {
+    const n = base + (extraRows.has(i) ? 1 : 0);
+    if (n <= 0) continue;
+    rows.push({ start: nextStart - n + 1, count: n });
+    nextStart -= n;
   }
   return rows;
 }

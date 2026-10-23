@@ -485,3 +485,82 @@
   .usgrid-dollar{display:inline-block;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:0.75em;vertical-align:baseline;margin-right:0.08em;transform:scaleX(1.40) scaleY(1.12);transform-origin:center center;}
   .usgrid-comma{display:inline-block;margin-left:-0.06em;margin-right:-0.04em;}
 
+
+  /* ---------- Custom Models: picture square beside each briefcase ---------- */
+  /* renderGrid wraps every briefcase in a .case-cell so its model square can sit
+     on the right without the case graphic changing size or shape. */
+  .case-row > .case-cell{
+    display:flex;
+    align-items:flex-start;
+    gap:4px;
+    flex:0 1 auto;
+    min-width:0;
+  }
+  /* The case graphic is all absolutely positioned, so it has no intrinsic
+     width: the explicit width is what gives the cell (and the row) something to
+     size against. */
+  .case-cell > .briefcase{
+    flex:0 1 84px;
+    width:84px;
+    min-width:0;
+  }
+  /* With the picture squares on, renderGrid plans fewer cases per row so the
+     pairs always fit: nothing scrolls and nothing is cut off. The case width is
+     measured per layout (--model-case-w) and the square is exactly as tall as
+     the case it sits beside. */
+  .case-grid.models-on .case-cell{flex:0 0 auto;}
+  .case-grid.models-on .case-cell > .briefcase{
+    flex:0 0 var(--model-case-w, 72px);
+    width:var(--model-case-w, 72px);
+    min-width:0;
+  }
+  .case-grid.models-on .model-avatar{
+    width:calc(var(--model-case-w, 72px) * 0.82);
+    height:calc(var(--model-case-w, 72px) * 0.82);
+    margin-top:0;
+    border-radius:7px;
+  }
+  /* Custom Models makes each case narrower than a full 84px one, so the printed
+     number has to scale with the case instead of spilling past its edges. With
+     models off the case keeps its normal size and the number is untouched. */
+  .case-grid.models-on .briefcase{
+    container-type:inline-size;
+  }
+  .case-grid.models-on .briefcase .num{
+    font-size:min(2.8rem, 56cqw);
+  }
+  /* Hidden until Settings → Custom Models (or the 🖼️ panel) switches it on. */
+  .model-avatar{
+    display:none;
+    position:relative;
+    width:22px;
+    height:22px;
+    margin-top:2px;
+    flex:0 0 auto;
+    border-radius:6px;
+    border:1px solid rgba(139,147,168,0.35);
+    background:rgba(255,255,255,0.05);
+    background-size:cover;
+    background-position:center;
+    transition:opacity .6s ease, transform .18s ease;
+  }
+  .case-grid.models-on .model-avatar{display:block;}
+  /* Once a case is taken off the table (hide opened cases), its picture goes
+     with it — no bare square left floating on the shelf. */
+  .case-cell:has(> .briefcase.opened.opened-hidden) .model-avatar{
+    opacity:0;
+    transform:scale(0.85);
+    pointer-events:none;
+  }
+  /* The empty square is the default: a faint silhouette, like a blank avatar. */
+  .model-avatar:not(.has-image)::after{
+    content:'👤';
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:0.72rem;
+    opacity:0.3;
+    filter:grayscale(1);
+  }

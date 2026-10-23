@@ -1,7 +1,7 @@
 // ============================================
 // Sound effects (Web Audio synthesis + recorded MP3 stings)
 // ============================================
-import { game } from './game.js?v=100';
+import { game } from './game.js?v=101';
 
 let audioCtx = null;
 let audioMasterGain = null;

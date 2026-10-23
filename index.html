@@ -6,7 +6,7 @@
 <title>Deal or No Deal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Michroma&family=Archivo+Black&family=Anton&family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=Oswald:wght@300;500;600;700&family=Americana+Condensed:wght@700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=47">
+<link rel="stylesheet" href="style.css?v=52">
 </head>
 <body>
 <div class="app">
@@ -61,6 +61,7 @@
   <button class="emoji-btn" id="resetValuesBtn" title="Reset">↻</button>
   <button class="emoji-btn" id="shuffleBtn" title="Shuffle">🔀</button>
   <button class="settings-gear pb-select-btn" id="bgPickerBtn" title="Customization" aria-label="Customization">🎨</button>
+  <button class="settings-gear pb-select-btn" id="modelsBtn" title="Custom Models — add a picture per case" aria-label="Custom Models">🖼️</button>
 </div>
 <div class="settings-panel" id="settingsPanel" style="display:none;">
   <div class="settings-title">Settings</div>
@@ -83,6 +84,10 @@
   <label class="settings-row">
     <input type="checkbox" id="hideOpenedCasesToggle">
     <span>Hide Opened Cases<br><small>Remove opened briefcases from the grid after they are revealed.</small></span>
+  </label>
+  <label class="settings-row">
+    <input type="checkbox" id="customModelsToggle">
+    <span>Custom Models<br><small>Show a picture square beside each briefcase. Add the pictures from the 🖼️ button at the bottom.</small></span>
   </label>
   <label class="settings-row">
     <input type="checkbox" id="hostModeToggle">
@@ -129,6 +134,17 @@
     <div class="pb-save-row" style="margin-top:12px;">
       <button class="btn primary" id="pbSaveConfirmBtn">Save</button>
       <button class="btn ghost" id="closePbSelectBtn">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="models-panel" id="modelsPanel" style="display:none;" onclick="if(event.target===this)this.style.display='none'">
+  <div class="models-card">
+    <div class="settings-title">Custom Models</div>
+    <p class="models-hint">Each briefcase gets a picture square on its right. Paste an image link in a row, or copy an image and press <b>Ctrl+V</b> on a row — a pasted picture is shrunk and kept locally.</p>
+    <div class="models-list" id="modelsList"></div>
+    <div class="pb-save-row" style="margin-top:12px;">
+      <button class="btn primary" id="closeModelsBtn">Done</button>
     </div>
   </div>
 </div>
@@ -273,7 +289,7 @@
     } else {
       var s = document.createElement('script');
       s.type = 'module';
-      s.src = 'js/main.js?v=31';
+      s.src = 'js/main.js?v=34';
       document.body.appendChild(s);
     }
   })();

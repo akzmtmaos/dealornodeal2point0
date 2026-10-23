@@ -1,9 +1,9 @@
 // ============================================
 // Init / New Game
 // ============================================
-import { game, dom } from './game.js?v=100';
-import { getValuesForCount, buildSchedule, shuffleArr, logEvent, resetGameLog } from './helpers.js?v=101';
-import { renderAll, renderGrid, renderBoard, updateToolbar } from './render.js?v=104';
+import { game, dom } from './game.js?v=101';
+import { getValuesForCount, buildSchedule, shuffleArr, logEvent, resetGameLog } from './helpers.js?v=120';
+import { renderAll, renderGrid, renderBoard, updateToolbar } from './render.js?v=107';
 import { renderOffersHistory } from './banker.js?v=111';
 import { hideAll } from './center-stage.js?v=106';
 

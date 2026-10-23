@@ -10,7 +10,7 @@
      mark moves straight on to the following one, until the round is done.
    - The mark follows the game: it clears while the banker is on the line, the
      offer/decision is on the strip, or the game is over. */
-import { game, dom } from './game.js?v=100';
+import { game, dom } from './game.js?v=101';
 
 const PICK_CLASS = 'rand-2-pick';
 const YOUR_CASE_CLASS = 'rand-2-your-case';

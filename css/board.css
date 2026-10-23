@@ -182,6 +182,12 @@
     box-shadow:none;
     transition:transform .3s ease, opacity .3s ease, background .3s ease, box-shadow .3s ease, color .3s ease;
   }
+  /* Michroma sits a couple of pixels low inside its tile: lift the value text
+     so the digits read optically centred. (The squares variant centres each
+     cell itself.) */
+  .board:not(.board-bg-squares) .amount-row > span{
+    transform:translateY(-2px);
+  }
   .amount-row.eliminating{
     position:relative;
     z-index:10;

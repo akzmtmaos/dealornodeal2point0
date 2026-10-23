@@ -1,11 +1,12 @@
 // ============================================
 // Rendering
 // ============================================
-import { game, dom } from './game.js?v=100';
-import { fmtDisplayBoard, fmtDisplayBriefcase, getCaseGridRows, formatNumber, setBriefcaseAmount } from './helpers.js?v=101';
+import { game, dom } from './game.js?v=101';
+import { fmtDisplayBoard, fmtDisplayBriefcase, getCaseGridRows, getModelGridRows, formatNumber, setBriefcaseAmount } from './helpers.js?v=120';
 import { onCaseClick } from './cases.js?v=108';
 import { applyInteriorBg, getInteriorBgId, getBoardBgId, applyInteriorAmountStyling, wrapValueSquares, refreshCaseCountStrip } from './customization.js?v=121';
 import { refreshRandomizer2 } from './randomizer2.js?v=2';
+import { getModelImage } from './models.js?v=1';
 import { boardEliminateSound } from './sound.js?v=109';
 
 export function renderAll() {
@@ -60,10 +61,48 @@ export function caseInnerMarkup(n) {
   `;
 }
 
+/* Custom Models geometry: the picture square is exactly as tall as its case, so
+   the pair is 1 + 0.82 = 1.82 cases wide plus the gap between them. */
+const MODEL_CELL_GAP = 4;
+const CASE_ASPECT = 0.82;
+
+/** Picks the most cases per row that still leaves every case a readable size in
+ *  the width the grid actually has, and the case width that fills that row. */
+function modelLayout() {
+  const gridW = (dom.caseGrid.clientWidth || window.innerWidth) - 36; // minus the grid padding
+  const rowGap = 10; // matches --case-gap
+  for (let perRow = Math.min(7, game.caseCount); perRow >= 2; perRow--) {
+    const cellW = (gridW - rowGap * (perRow - 1)) / perRow;
+    const caseW = (cellW - MODEL_CELL_GAP) / (1 + CASE_ASPECT);
+    if (caseW >= 52) return { perRow, caseW };
+  }
+  const perRow = Math.min(2, game.caseCount);
+  const cellW = (gridW - rowGap * Math.max(0, perRow - 1)) / perRow;
+  return { perRow, caseW: Math.max(28, (cellW - MODEL_CELL_GAP) / (1 + CASE_ASPECT)) };
+}
+
 export function renderGrid() {
   dom.caseGrid.innerHTML = '';
-  dom.caseGrid.classList.toggle('grid-20', game.caseCount === 20);
-  getCaseGridRows(game.caseCount).forEach((cfg, rowIndex) => {
+  const useModels = !!game.customModels;
+  // The 20-case stagger is a plain-grid layout; the model rows are their own
+  // plan, so the two never stack.
+  dom.caseGrid.classList.toggle('grid-20', game.caseCount === 20 && !useModels);
+  // Custom Models puts a picture square to the right of every briefcase, and the
+  // layout gives the case grid more room to hold it.
+  dom.caseGrid.classList.toggle('models-on', useModels);
+  document.body.classList.toggle('models-on', useModels);
+
+  let rowPlan;
+  if (useModels) {
+    const layout = modelLayout();
+    dom.caseGrid.style.setProperty('--model-case-w', Math.round(layout.caseW) + 'px');
+    rowPlan = getModelGridRows(game.caseCount, layout.perRow);
+  } else {
+    dom.caseGrid.style.removeProperty('--model-case-w');
+    rowPlan = getCaseGridRows(game.caseCount);
+  }
+
+  rowPlan.forEach((cfg, rowIndex) => {
     const rowDiv = document.createElement('div');
     rowDiv.className = 'case-row' + (cfg.align ? ' ' + cfg.align : '');
 
@@ -110,7 +149,20 @@ export function renderGrid() {
 
       btn.disabled = disabled;
       btn.addEventListener('click', () => onCaseClick(n));
-      rowDiv.appendChild(btn);
+      // Each case sits in a cell so its model square can ride along on the right.
+      const cell = document.createElement('div');
+      cell.className = 'case-cell';
+      cell.appendChild(btn);
+      const model = document.createElement('span');
+      model.className = 'model-avatar';
+      model.dataset.case = n;
+      const modelUrl = getModelImage(n);
+      if (modelUrl) {
+        model.style.backgroundImage = `url("${modelUrl}")`;
+        model.classList.add('has-image');
+      }
+      cell.appendChild(model);
+      rowDiv.appendChild(cell);
     }
 
     const backShelf = document.createElement('div');

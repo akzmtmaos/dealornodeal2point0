@@ -458,3 +458,104 @@
     .briefcase.rand-2-pick,
     .briefcase.rand-2-your-case{animation:none;box-shadow:none;}
   }
+
+  /* ---------- Custom Models panel ---------- */
+  .models-panel{
+    position:fixed;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:100;
+    background:rgba(0,0,0,0.45);
+  }
+  .models-card{
+    width:min(92vw,430px);
+    max-height:76vh;
+    display:flex;
+    flex-direction:column;
+    background:linear-gradient(180deg,var(--bg-panel-2),var(--bg-panel));
+    border:1px solid rgba(231,187,77,0.25);
+    border-radius:12px;
+    padding:16px;
+    box-shadow:var(--shadow-deep);
+    animation:modalIn .25s ease;
+  }
+  .models-hint{
+    margin:0 0 10px;
+    font-family:'Inter',sans-serif;
+    font-size:0.7rem;
+    line-height:1.45;
+    color:var(--muted);
+  }
+  .models-hint b{color:var(--gold);}
+  .models-list{
+    flex:1;
+    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    padding-right:2px;
+  }
+  .model-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .model-row-num{
+    flex:0 0 auto;
+    width:26px;
+    font-family:'Oswald',sans-serif;
+    font-size:0.68rem;
+    letter-spacing:0.04em;
+    color:var(--ice);
+  }
+  .model-preview{
+    position:relative;
+    flex:0 0 auto;
+    width:30px;
+    height:30px;
+    border-radius:6px;
+    border:1px solid rgba(139,147,168,0.35);
+    background:rgba(255,255,255,0.05);
+    background-size:cover;
+    background-position:center;
+  }
+  .model-preview:not(.has-image)::after{
+    content:'👤';
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:0.8rem;
+    opacity:0.3;
+    filter:grayscale(1);
+  }
+  .model-url{
+    flex:1;
+    min-width:0;
+    padding:6px 8px;
+    border-radius:8px;
+    border:1px solid rgba(139,147,168,0.28);
+    background:rgba(255,255,255,0.05);
+    color:var(--ivory);
+    font-family:'Inter',sans-serif;
+    font-size:0.72rem;
+    outline:none;
+  }
+  .model-url:focus{border-color:var(--gold-dim);}
+  .model-url::placeholder{color:var(--muted);}
+  .model-clear{
+    flex:0 0 auto;
+    width:24px;
+    height:24px;
+    border-radius:6px;
+    border:1px solid rgba(139,147,168,0.25);
+    background:rgba(255,255,255,0.03);
+    color:var(--muted);
+    font-size:0.7rem;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .model-clear:hover{color:var(--danger);border-color:var(--danger);}

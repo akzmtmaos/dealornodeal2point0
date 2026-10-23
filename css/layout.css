@@ -23,15 +23,49 @@
     gap:26px;
     align-items:flex-end;
     justify-content:center;
-    flex-wrap:wrap;
+    /* The prize board stays to the right of the cases at every width — it never
+       drops underneath them. The cases give up width first. */
+    flex-wrap:nowrap;
   }
   .grid-panel{
     flex:1 1 560px;
+    min-width:0;
     max-width:640px;
+  }
+  /* Custom Models puts a picture square beside every briefcase, so the case grid
+     is allowed to grow into more of the width when the feature is on. */
+  body.models-on .grid-panel{
+    flex:1 1 720px;
+    /* Never wider than the viewport, or the whole page scrolls sideways. */
+    max-width:min(840px, 100%);
   }
   .board-panel{
     flex:0 0 auto;
+    min-width:0;
     max-width:360px;
+  }
+  /* Narrow windows: the board compacts (smaller type + tighter rows) so the
+     cases keep most of the width instead of the board being pushed below. */
+  @media (max-width:1100px){
+    .board-panel{
+      max-width:min(44vw,340px);
+    }
+    .board{
+      gap:8px;
+      padding:6px;
+    }
+    .board-col{
+      flex:0 1 auto;
+      min-width:0;
+    }
+    .board .amount-row{
+      max-width:100%;
+      font-size:clamp(0.54rem,1.3vw,0.88rem);
+      padding:3px 5px;
+    }
+    .board .board-toolbar{
+      flex-wrap:wrap;
+    }
   }
   .board-panel:has(.board.board-bg-squares.board-squares-wide){
     max-width:min(calc(100vw - 24px),520px);

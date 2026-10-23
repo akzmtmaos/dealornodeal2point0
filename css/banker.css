@@ -1,17 +1,74 @@
   /* ---------- Banker offer popup: bottom-right, non-blocking (Previous Offers stacks above it) ---------- */
   .banker-popup{
     position:fixed;
-    bottom:86px;left:18px;
-    z-index:92;
+    /* Tucked into the bottom-right corner, clear of the case table. Smaller card
+       than the old bottom-left one, with the log sitting behind it while a call
+       is on screen. */
+    bottom:18px;right:18px;
+    z-index:97;
     display:flex;
     flex-direction:column;
-    align-items:stretch;
-    gap:12px;
-    width:min(80vw,230px);
+    align-items:flex-end;
+    gap:10px;
+    width:min(64vw,196px);
     opacity:0;
     transform:translateY(24px);
     pointer-events:none;
     transition:opacity .35s ease, transform .35s ease;
+  }
+  /* Compact banker card: the corner popup only has room for the essentials. */
+  .banker-popup .banker-call-card{
+    padding:14px 12px 16px;
+    border-radius:12px;
+    max-width:100%;
+  }
+  .banker-popup .phone-icon{
+    font-size:1.45rem;
+  }
+  .banker-popup .offer-status{
+    margin-top:8px;
+    font-size:0.68rem;
+    line-height:1.4;
+  }
+  .banker-popup .offer-label{
+    margin:10px 0 8px;
+    font-size:0.64rem;
+    letter-spacing:0.12em;
+    line-height:1.5;
+  }
+  .banker-popup .offer-buttons{
+    gap:8px;
+  }
+  .banker-popup #dealBtn,
+  .banker-popup #noDealBtn,
+  .banker-popup #counterLinkBtn,
+  .banker-popup #bankerCallBtn,
+  .banker-popup #revealOfferBtn,
+  .banker-popup #continuePlayoutBtn,
+  .banker-popup #submitCounterBtn,
+  .banker-popup #cancelCounterBtn{
+    padding:9px 8px;
+    font-size:0.62rem;
+  }
+  .banker-popup .counter-panel{
+    margin-top:10px;
+    padding-top:10px;
+  }
+  .banker-popup .counter-label{
+    font-size:0.62rem;
+    margin-bottom:8px;
+  }
+  .banker-popup .counter-input-row{
+    margin-bottom:10px;
+  }
+  .banker-popup .counter-input-row input{
+    width:100%;
+    max-width:110px;
+    padding:6px 8px;
+    font-size:1.05rem;
+  }
+  .banker-popup .counter-dollar{
+    font-size:1.05rem;
   }
   .banker-popup,
   .banker-popup *{
