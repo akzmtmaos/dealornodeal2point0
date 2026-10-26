@@ -1,14 +1,14 @@
 // ============================================
 // Settings gear
 // ============================================
-import { game, dom } from './game.js?v=101';
-import { MIN_CASE_COUNT, MAX_CASE_COUNT } from './game.js?v=101';
+import { game, dom } from './game.js?v=102';
+import { MIN_CASE_COUNT, MAX_CASE_COUNT } from './game.js?v=102';
 import { logEvent, fmtDisplayBoard } from './helpers.js?v=120';
-import { renderGrid, renderYourCase } from './render.js?v=107';
-import { refreshCurrencyDisplay } from './render.js?v=107';
-import { applySfxLevel } from './sound.js?v=109';
-import { newGame } from './init.js?v=109';
-import { setModelsEnabled } from './models.js?v=1';
+import { renderGrid, renderYourCase } from './render.js?v=110';
+import { refreshCurrencyDisplay } from './render.js?v=110';
+import { applySfxLevel } from './sound.js?v=110';
+import { newGame } from './init.js?v=110';
+import { setModelsEnabled, setFixedCaseModelDisabled } from './models.js?v=2';
 
 dom.settingsGear.addEventListener('click', (e) => {
   e.stopPropagation();
@@ -193,6 +193,12 @@ dom.hostModeToggle.addEventListener('change', () => {
 // moment they change rather than on Save.
 dom.customModelsToggle.addEventListener('change', () => {
   setModelsEnabled(dom.customModelsToggle.checked);
+});
+
+// Off = each picture stays on its own case; on = the pictures are dealt to
+// random cases every game.
+dom.disableFixedModelToggle.addEventListener('change', () => {
+  setFixedCaseModelDisabled(dom.disableFixedModelToggle.checked);
 });
 
 /** Shows/hides the bottom-right log panel to match the current setting. */

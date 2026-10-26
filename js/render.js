@@ -1,13 +1,13 @@
 // ============================================
 // Rendering
 // ============================================
-import { game, dom } from './game.js?v=101';
+import { game, dom } from './game.js?v=102';
 import { fmtDisplayBoard, fmtDisplayBriefcase, getCaseGridRows, getModelGridRows, formatNumber, setBriefcaseAmount } from './helpers.js?v=120';
 import { onCaseClick } from './cases.js?v=108';
 import { applyInteriorBg, getInteriorBgId, getBoardBgId, applyInteriorAmountStyling, wrapValueSquares, refreshCaseCountStrip } from './customization.js?v=121';
 import { refreshRandomizer2 } from './randomizer2.js?v=2';
-import { getModelImage } from './models.js?v=1';
-import { boardEliminateSound } from './sound.js?v=109';
+import { getModelImage } from './models.js?v=2';
+import { boardEliminateSound } from './sound.js?v=110';
 
 export function renderAll() {
   renderGrid();
@@ -320,26 +320,40 @@ export function updateToolbar() {
   }
 }
 
-let shelfFlashTimer = null;
 /** Washes the whole case table's shelf rails a single solid color the moment
  *  a case value is revealed: all yellow for values below $100K, all red for
- *  $100K and up. Both are brief flashes — the rails return to their normal
- *  animated gradient on their own shortly after. The gradient loops keep
- *  running underneath, so the rails resume seamlessly once the wash lifts. */
+ *  $100K and up. The wash holds until the reveal is dismissed — the Continue
+ *  button in manual mode, or the end of the stage animation otherwise — so the
+ *  result stays readable instead of vanishing on a timer. The gradient loops
+ *  keep running underneath, so the rails resume seamlessly once it lifts. */
 export function flashTableShelves(value) {
   dom.caseGrid.classList.remove('shelf-red-all', 'shelf-flash-yellow');
-  clearTimeout(shelfFlashTimer);
   if (value < 100000) {
     dom.caseGrid.classList.add('shelf-flash-yellow');
   } else {
     dom.caseGrid.classList.add('shelf-red-all');
   }
-  shelfFlashTimer = setTimeout(() => {
-    dom.caseGrid.classList.remove('shelf-red-all', 'shelf-flash-yellow');
-  }, 1300);
 }
 
 export function clearShelfFlash() {
   dom.caseGrid.classList.remove('shelf-red-all', 'shelf-flash-yellow');
-  clearTimeout(shelfFlashTimer);
+}
+
+let shelfBlinkTimers = [];
+/** Two quick washes of yellow over the shelf rails, fired while the banker's
+ *  offer flips into its container. The class is toggled on/off rather than
+ *  animated so the rails drop straight back to their own gradient between
+ *  flashes; calling it again continues the blinking. */
+export function blinkTableShelves() {
+  shelfBlinkTimers.forEach(clearTimeout);
+  shelfBlinkTimers = [];
+  const toggle = (on, delay) => {
+    shelfBlinkTimers.push(setTimeout(() => {
+      dom.caseGrid.classList.toggle('shelf-blink-yellow', on);
+    }, delay));
+  };
+  toggle(true, 0);
+  toggle(false, 130);
+  toggle(true, 210);
+  toggle(false, 340);
 }

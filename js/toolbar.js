@@ -1,10 +1,10 @@
 // ============================================
 // Toolbar actions
 // ============================================
-import { game, dom } from './game.js?v=101';
+import { game, dom } from './game.js?v=102';
 import { getValuesForCount } from './helpers.js?v=120';
-import { renderBoard, renderAll, updateToolbar } from './render.js?v=107';
-import { assignCases } from './init.js?v=109';
+import { renderBoard, renderAll, updateToolbar } from './render.js?v=110';
+import { assignCases } from './init.js?v=110';
 
 function pulseGrid() {
   const cases = [...dom.caseGrid.querySelectorAll('.briefcase')];

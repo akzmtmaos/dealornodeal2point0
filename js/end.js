@@ -1,11 +1,11 @@
 // ============================================
 // End Game
 // ============================================
-import { game, dom } from './game.js?v=101';
+import { game, dom } from './game.js?v=102';
 import { fmt } from './helpers.js?v=120';
-import { renderAll } from './render.js?v=107';
+import { renderAll } from './render.js?v=110';
 import { triggerDangerFlash } from './helpers.js?v=120';
-import { newGame } from './init.js?v=109';
+import { newGame } from './init.js?v=110';
 
 export function endGame(mode, chosenCase, otherCase) {
   game.state = 'ended';

@@ -1,11 +1,11 @@
 // ============================================
 // Center-stage opening animation
 // ============================================
-import { game, dom } from './game.js?v=101';
+import { game, dom } from './game.js?v=102';
 import { setBriefcaseAmount, isBigValue, isLowValue, isHighestRemaining, triggerDangerFlash, triggerYellowFlash } from './helpers.js?v=120';
-import { caseInnerMarkup, flashTableShelves, clearShelfFlash } from './render.js?v=107';
+import { caseInnerMarkup, flashTableShelves, clearShelfFlash } from './render.js?v=110';
 import { applyInteriorBg, getInteriorBgId, applyInteriorAmountStyling } from './customization.js?v=121';
-import { revealSoundLow, revealSoundHigh, playRevealSound, startTensionRoll, stopBankerRingLoop } from './sound.js?v=109';
+import { revealSoundLow, revealSoundHigh, playRevealSound, startTensionRoll, stopBankerRingLoop } from './sound.js?v=110';
 
 export function hideAll() {
   awaitingContinue = false;
@@ -133,6 +133,9 @@ export function revealCaseAnimated(n, label, callback, dangerAware, onCancel, re
     dom.manualContinueBtn.onclick = () => {
       awaitingContinue = false;
       dom.manualContinueBtn.onclick = null; // a hidden button must never re-fire an old reveal
+      // Continue is what releases the shelf wash, so the yellow/red result
+      // stays on the table for as long as the player looks at it.
+      clearShelfFlash();
       dom.manualContinueBtn.classList.remove('show');
       dom.manualContinueBtn.style.display = 'none';
       // Close the revealed case right away — once Continue is
@@ -183,6 +186,9 @@ export function revealCaseAnimated(n, label, callback, dangerAware, onCancel, re
     setTimeout(() => {
       dom.centerStage.classList.remove('show');
       dom.spotlightBackdrop.classList.remove('show');
+      // Auto reveals have no Continue button, so the stage closing is what
+      // releases the shelf wash.
+      clearShelfFlash();
     }, travelMs + 2050);
 
     setTimeout(() => {

@@ -1,10 +1,10 @@
 // ============================================
 // Customization Picker (case interior + board value backgrounds)
 // ============================================
-import { game, dom } from './game.js?v=101';
-import { offerStripTickSound } from './sound.js?v=109';
+import { game, dom } from './game.js?v=102';
+import { offerStripTickSound } from './sound.js?v=110';
 import { formatNumber } from './helpers.js?v=120';
-import { renderBoard } from './render.js?v=107';
+import { renderBoard } from './render.js?v=110';
 
 /* ---------- Case Interior Background ---------- */
 const BG_OPTIONS = [

@@ -1,14 +1,14 @@
 // ============================================
 // Banker Offer
 // ============================================
-import { game, dom } from './game.js?v=101';
+import { game, dom } from './game.js?v=102';
 import { fmt, fmtDisplayBoard, logEvent, remainingAmountValues } from './helpers.js?v=120';
-import { renderGrid, renderAll, eliminateBoardValue } from './render.js?v=107';
-import { revealCaseAnimated, updateStatus, hideAll } from './center-stage.js?v=106';
+import { renderGrid, renderAll, eliminateBoardValue, blinkTableShelves } from './render.js?v=110';
+import { revealCaseAnimated, updateStatus, hideAll } from './center-stage.js?v=107';
 import { showFinalDecision } from './final.js?v=117';
 import { endGame } from './end.js?v=115';
 import { revealCounterDecision } from './counter.js?v=107';
-import { playBankerRing, startBankerRingLoop, stopBankerRingLoop } from './sound.js?v=109';
+import { playBankerRing, startBankerRingLoop, stopBankerRingLoop } from './sound.js?v=110';
 
 // Re-export for counter.js, which (like the original monolith) reaches the
 // final-decision screen through the banker module.
@@ -305,8 +305,21 @@ export function renderOffersHistory() {
   game.offerHistory.forEach((entry, i) => {
     const chip = document.createElement('div');
     chip.className = 'offer-chip offer-sequence-item' + (i === game.offerHistory.length - 1 ? ' latest' : '');
-    chip.style.setProperty('--offer-sequence-delay', `${i * 120}ms`);
-    chip.innerHTML = `<span class="oc-amount">${fmt(entry.amount)}</span>`;
+    // One container every 560ms: each offer lands and its amount starts fading
+    // in before the next one slides, so the list reads as a queue, not a block.
+    chip.style.setProperty('--offer-sequence-delay', `${i * 560}ms`);
+    // The amount is split into one span per character so the value can fade in
+    // left to right instead of appearing as a single block.
+    const amount = document.createElement('span');
+    amount.className = 'oc-amount';
+    [...fmt(entry.amount)].forEach((char, charIndex) => {
+      const glyph = document.createElement('span');
+      glyph.className = 'oc-char';
+      glyph.style.setProperty('--char-i', charIndex);
+      glyph.textContent = char;
+      amount.appendChild(glyph);
+    });
+    chip.appendChild(amount);
     dom.offersList.appendChild(chip);
   });
 }
@@ -504,6 +517,10 @@ dom.revealOfferBtn.addEventListener('click', () => {
     return;
   }
   dom.bankerOfferDisplay.classList.add('flip-anim');
+  // The table blinks yellow while the offer flips in, so the reveal lands with
+  // the shelves lit up rather than against a static background.
+  blinkTableShelves();
+  setTimeout(blinkTableShelves, 340);
   setTimeout(() => {
     dom.bankerOfferDisplay.textContent = fmtDisplayBoard(game.lastOffer);
   }, 300);

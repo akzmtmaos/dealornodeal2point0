@@ -7,38 +7,99 @@
    either by pasting an image link or by copying an image and pressing Ctrl+V on
    a row. Pasted images are shrunk to a thumbnail data URL so a full set still
    fits comfortably in localStorage. */
-import { game, dom } from './game.js?v=101';
+import { game, dom } from './game.js?v=102';
 import { logEvent } from './helpers.js?v=120';
 
 const STORAGE_KEY = 'dnd_model_images';
 const THUMB_SIZE = 96;          // pasted pictures are cropped to this square
 const STORE_BUDGET = 2_000_000; // rough character budget for all data URLs
 
-let images = {};   // { [caseNumber]: url }
+let images = {};        // { [caseNumber]: url } — the picture given to each row
 let enabled = false;
+let disableFixed = false; // "Disable Fixed Case Model"
+let dealt = null;        // { [caseNumber]: url } — the shuffled deal, built on demand
 
 function load() {
   try {
     const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
     enabled = !!raw.enabled;
+    disableFixed = !!raw.disableFixed;
     images = raw.images && typeof raw.images === 'object' ? raw.images : {};
   } catch (e) {
     enabled = false;
+    disableFixed = false;
     images = {};
   }
 }
 
 function persist() {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ enabled, images }));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ enabled, disableFixed, images }));
   } catch (e) {
     logEvent('Could not save the model pictures — browser storage is full.');
   }
 }
 
-/** Picture assigned to a case, or null for the empty placeholder. */
+/**
+ * Deals the pictures to random cases, so no picture is tied to the number it was
+ * added to. Called on a new game, when a picture changes and when the setting is
+ * switched on, so a deal stays steady for the whole game it belongs to.
+ */
+export function reshuffleModels() {
+  dealt = null;
+  if (!disableFixed) return;
+  const pool = Object.values(images).filter(Boolean);
+  if (!pool.length) return;
+
+  // Fisher–Yates on both decks: which pictures, and which case numbers get one.
+  const shuffle = (list) => {
+    const copy = [...list];
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  };
+
+  const pictures = shuffle(pool);
+  const caseNumbers = shuffle(Array.from({ length: Math.max(0, game.caseCount) }, (_, i) => i + 1));
+  dealt = {};
+  pictures.forEach((url, i) => {
+    if (i < caseNumbers.length) dealt[String(caseNumbers[i])] = url;
+  });
+}
+
+/** Picture shown beside a case, or null for the empty placeholder. */
 export function getModelImage(n) {
+  if (disableFixed) {
+    if (!dealt) reshuffleModels();
+    return (dealt && dealt[String(n)]) || null;
+  }
   return images[String(n)] || null;
+}
+
+/** Picture as added on a panel row (the row keeps the case number the user chose). */
+export function getModelSourceImage(n) {
+  return images[String(n)] || null;
+}
+
+export function isFixedCaseModelDisabled() {
+  return disableFixed;
+}
+
+/** Turns the "Disable Fixed Case Model" setting on/off and re-deals the pictures. */
+export function setFixedCaseModelDisabled(value) {
+  disableFixed = !!value;
+  if (dom.disableFixedModelToggle) dom.disableFixedModelToggle.checked = disableFixed;
+  applyRandomHint();
+  persist();
+  reshuffleModels();
+  document.dispatchEvent(new CustomEvent('dnd:models-changed'));
+}
+
+/** Shows the "pictures are random" note in the models panel. */
+function applyRandomHint() {
+  if (dom.modelsRandomHint) dom.modelsRandomHint.style.display = disableFixed ? '' : 'none';
 }
 
 export function isModelsEnabled() {
@@ -68,6 +129,8 @@ function setImage(n, url) {
     images[key] = url;
   }
   persist();
+  // The pool changed, so a random deal no longer matches it.
+  reshuffleModels();
   document.dispatchEvent(new CustomEvent('dnd:models-changed'));
   updateRow(n);
 }
@@ -88,7 +151,9 @@ function rowFor(n) {
     <button class="model-clear" type="button" title="Remove picture" data-clear="${n}">✕</button>
   `;
   const input = row.querySelector('input');
-  input.value = getModelImage(n) || '';
+  // Rows always show the picture added to that row, even while the board deals
+  // them out to random cases.
+  input.value = getModelSourceImage(n) || '';
 
   let debounce = null;
   input.addEventListener('input', () => {
@@ -118,7 +183,7 @@ function updateRow(n) {
   if (!dom.modelsList) return;
   const row = dom.modelsList.querySelector(`.model-row[data-case="${n}"]`);
   if (!row) return;
-  const url = getModelImage(n);
+  const url = getModelSourceImage(n);
   const preview = row.querySelector('.model-preview');
   if (preview) {
     preview.style.backgroundImage = url ? `url("${url}")` : '';
@@ -136,7 +201,7 @@ function buildRows() {
     dom.modelsList.appendChild(row);
     updateRow(n);
     const preview = row.querySelector('.model-preview');
-    const url = getModelImage(n);
+    const url = getModelSourceImage(n);
     if (preview) {
       preview.style.backgroundImage = url ? `url("${url}")` : '';
       preview.classList.toggle('has-image', !!url);
@@ -189,6 +254,9 @@ export function initModels() {
   load();
   game.customModels = enabled;
   if (dom.customModelsToggle) dom.customModelsToggle.checked = enabled;
+  if (dom.disableFixedModelToggle) dom.disableFixedModelToggle.checked = disableFixed;
+  applyRandomHint();
+  reshuffleModels();
 
   if (dom.modelsBtn) dom.modelsBtn.addEventListener('click', (e) => {
     e.stopPropagation();

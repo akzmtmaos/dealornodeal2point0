@@ -1,14 +1,14 @@
-  /* ---------- Banker offer popup: bottom-right, non-blocking (Previous Offers stacks above it) ---------- */
+  /* ---------- Banker offer popup: bottom-left, non-blocking (Previous Offers stacks above it) ---------- */
   .banker-popup{
     position:fixed;
-    /* Tucked into the bottom-right corner, clear of the case table. Smaller card
-       than the old bottom-left one, with the log sitting behind it while a call
-       is on screen. */
-    bottom:18px;right:18px;
+    /* Tucked into the bottom-left corner, opposite the game log and clear of the
+       case table. Smaller card than the old one, aligned to the left edge so the
+       offer amount and buttons share that edge. */
+    bottom:18px;left:18px;right:auto;
     z-index:97;
     display:flex;
     flex-direction:column;
-    align-items:flex-end;
+    align-items:flex-start;
     gap:10px;
     width:min(64vw,196px);
     opacity:0;
@@ -138,6 +138,9 @@
     filter:brightness(1.12);
     transform:translateY(-1px);
   }
+  /* Previous Offers: square gold plates, values right-aligned and set very
+     heavy — the same weight as the show's on-screen board. The plates are
+     narrower than the title strip and hug its right edge. */
   .offers-panel {
     position: fixed;
     top: 18px;
@@ -145,47 +148,81 @@
     z-index: 92;
     display: flex;
     flex-direction: column;
-    gap: 0;
-    width: min(80vw, 180px);
+    gap: 4px;
+    width: min(80vw, 210px);
   }
   .offers-title {
     display: block;
     font-family: 'Michroma', sans-serif;
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     font-weight: 900;
-    letter-spacing: 0.08em;
+    /* Stretched so the words span the strip from edge to edge; 0.135em is the
+       widest tracking that still fits inside the 210px strip on one line. */
+    letter-spacing: 0.135em;
+    white-space: nowrap;
     text-transform: uppercase;
     color: #1a1608;
-    padding: 5px 8px;
+    padding: 6px;
     margin: 0;
-    background: linear-gradient(180deg, var(--yellow-hi), var(--yellow));
-    border: none;
+    background: linear-gradient(180deg, #ffe98a 0%, var(--yellow-hi) 42%, var(--yellow) 100%);
+    border: 1px solid rgba(20,16,6,0.45);
+    border-radius: 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.55);
+    text-align: center;
+    -webkit-text-stroke: 0.05em currentColor;
+    paint-order: stroke fill;
   }
 .offers-list {
   display: flex;
   flex-direction: column;
-  gap: 0;
-}  .offers-list > div {
-  background: linear-gradient(180deg, var(--yellow-hi), var(--yellow));
-  border: none;
-  border-radius: 0;
-  padding: 5px 8px;
-  color: #1a1608;
-  font-family: 'Michroma', sans-serif;
-  font-size: 1.2rem;
-  font-weight: 900;
-  letter-spacing: 0;
-  text-align: left;
-  box-shadow: none;
+  align-items: stretch;
+  gap: 4px;
+  /* Same 4px breathing room the plates have between each other. The panel is
+     display:block at runtime (banker.js sets it), so this margin is the only
+     space between the title strip and the first plate. */
+  margin-top: 4px;
+}  .offers-list > div,
+  .offers-panel .offer-chip {
+  /* Narrower than the title strip, flush with the right edge. */
+  width: calc(100% - 20px);
+  margin-left: auto;
+  /* Pickers on the plate: #dab25f ground, #f7f996 glow at the edges. */
+  background: #dab25f !important;
+  border: 1px solid rgba(20,16,6,0.45) !important;
+  border-radius: 0 !important;
+  padding: 3px 9px 4px !important;
+  color: #1a1608 !important;
+  font-family: 'Michroma', sans-serif !important;
+  font-size: 1.35rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0 !important;
+  text-align: right !important;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.45), inset 0 1px 0 rgba(247,249,150,0.55) !important;
+  position: relative;
+  isolation: isolate;
 }
-  .offers-panel .offer-chip{
-    padding:5px 8px !important;
-    background:linear-gradient(180deg, var(--yellow-hi), var(--yellow)) !important;
-    border:none !important;
-    border-radius:0 !important;
-    font-family:'Michroma',sans-serif !important;
-    font-weight:900 !important;
-    text-align:left !important;
+  /* Light blooming off the top and bottom edges of each plate, fading out
+     before it reaches the middle so the value keeps the plain gold ground.
+     The pseudo elements sit behind the text (z-index:-1 inside the plate's own
+     stacking context) but above the plate's background. */
+  .offers-panel .offer-chip::before,
+  .offers-panel .offer-chip::after{
+    content:"";
+    position:absolute;
+    left:0;right:0;
+    height:42%;
+    pointer-events:none;
+    z-index:-1;
+  }
+  .offers-panel .offer-chip::before{
+    top:0;
+    background:linear-gradient(180deg, #f7f996 0%, rgba(247,249,150,0.55) 20%, rgba(247,249,150,0) 100%);
+    box-shadow:0 -3px 9px rgba(247,249,150,0.38);
+  }
+  .offers-panel .offer-chip::after{
+    bottom:0;
+    background:linear-gradient(0deg, #f7f996 0%, rgba(247,249,150,0.55) 20%, rgba(247,249,150,0) 100%);
+    box-shadow:0 3px 9px rgba(247,249,150,0.38);
   }
   .offers-panel .offer-chip .oc-amount{
     display:block;
@@ -193,10 +230,17 @@
     padding:0 !important;
     margin:0 !important;
     font-family:'Michroma',sans-serif !important;
-    font-size:1.2rem !important;
+    font-size:1.35rem !important;
+    line-height:1.1 !important;
     font-weight:900 !important;
-    text-align:left !important;
+    letter-spacing:0 !important;
+    text-align:right !important;
     color:#1a1608 !important;
+    /* Michroma ships a single weight, so the extra thickness is painted as a
+       centred stroke in the text colour — that doubles the stem width without
+       switching typeface. */
+    -webkit-text-stroke:0.075em currentColor;
+    paint-order:stroke fill;
   }
   .offer-chip .oc-round{
     font-family:'Oswald',sans-serif;
@@ -215,23 +259,36 @@
     border-color:var(--gold);
   }
 
+  /* Offers arrive one at a time: a container slides in and settles before the
+     next one starts moving (the gap lives in the per-item
+     --offer-sequence-delay set from banker.js). The amount inside fades in a
+     beat after its own container, so the number settles rather than racing. */
   .offers-panel .offer-chip {
-    animation:previousOfferSlideIn 0.4s ease-out both;
+    animation:previousOfferSlideIn 0.5s cubic-bezier(.22,.61,.36,1) both;
   }
   .offers-panel .offer-sequence-item {
     animation-delay:var(--offer-sequence-delay, 0ms);
   }
 
-  .offers-panel .offer-chip .oc-amount {
-    animation:previousOfferAmountSlideIn 0.45s ease-out both;
-    animation-delay:inherit;
+  /* One character at a time: each glyph fades in on its own beat, left to
+     right, just after its plate has landed. */
+  .offers-panel .offer-chip .oc-char {
+    display:inline-block;
+    opacity:0;
+    animation:previousOfferCharFade 0.42s ease-out both;
+    animation-delay:calc(var(--offer-sequence-delay, 0ms) + 260ms + var(--char-i, 0) * 45ms);
+  }
+  /* A hair of air between glyphs so the heavy face doesn't read as crowded.
+     Only between characters, so the value keeps its right-hand inset. */
+  .offers-panel .offer-chip .oc-char + .oc-char {
+    margin-left:2px;
   }
 
   @keyframes previousOfferSlideIn {
     0% { transform: translateX(-100%); opacity: 0; }
     100% { transform: translateX(0); opacity: 1; }
   }
-  @keyframes previousOfferAmountSlideIn {
-    0% { transform: translateX(-50%); opacity: 0; }
-    100% { transform: translateX(0); opacity: 1; }
+  @keyframes previousOfferCharFade {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
   }

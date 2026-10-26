@@ -6,7 +6,7 @@
 <title>Deal or No Deal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Michroma&family=Archivo+Black&family=Anton&family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=Oswald:wght@300;500;600;700&family=Americana+Condensed:wght@700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=52">
+<link rel="stylesheet" href="style.css?v=72">
 </head>
 <body>
 <div class="app">
@@ -90,6 +90,10 @@
     <span>Custom Models<br><small>Show a picture square beside each briefcase. Add the pictures from the 🖼️ button at the bottom.</small></span>
   </label>
   <label class="settings-row">
+    <input type="checkbox" id="disableFixedModelToggle">
+    <span>Disable Fixed Case Model<br><small>Deal the pictures to random cases at the start of each game, instead of keeping each picture on the case you added it to.</small></span>
+  </label>
+  <label class="settings-row">
     <input type="checkbox" id="hostModeToggle">
     <span>Host Mode
       <br><small>Enable CALL/END CALL flow in the banker panel.</small>
@@ -142,6 +146,7 @@
   <div class="models-card">
     <div class="settings-title">Custom Models</div>
     <p class="models-hint">Each briefcase gets a picture square on its right. Paste an image link in a row, or copy an image and press <b>Ctrl+V</b> on a row — a pasted picture is shrunk and kept locally.</p>
+    <p class="models-hint models-hint-random" id="modelsRandomHint" style="display:none;"><b>Disable Fixed Case Model</b> is on — these pictures are dealt to random cases at the start of every game, so a row's number is only where the picture is stored.</p>
     <div class="models-list" id="modelsList"></div>
     <div class="pb-save-row" style="margin-top:12px;">
       <button class="btn primary" id="closeModelsBtn">Done</button>
@@ -289,7 +294,7 @@
     } else {
       var s = document.createElement('script');
       s.type = 'module';
-      s.src = 'js/main.js?v=34';
+      s.src = 'js/main.js?v=37';
       document.body.appendChild(s);
     }
   })();
