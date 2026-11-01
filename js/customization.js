@@ -1,7 +1,7 @@
 // ============================================
 // Customization Picker (case interior + board value backgrounds)
 // ============================================
-import { game, dom } from './game.js?v=104';
+import { game, dom } from './game.js?v=106';
 import { offerStripTickSound } from './sound.js?v=110';
 import { formatNumber } from './helpers.js?v=120';
 import { renderBoard } from './render.js?v=111';

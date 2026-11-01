@@ -1,7 +1,7 @@
 // ============================================
 // Helpers — formatting, logging, value checks
 // ============================================
-import { game, dom, STANDARD_VALUES } from './game.js?v=104';
+import { game, dom, STANDARD_VALUES } from './game.js?v=106';
 
 export function formatNumber(v) {
   if (v < 1) return v.toFixed(2).replace(/^0(?=\.)/, '');

@@ -1,7 +1,7 @@
 // ============================================
 // Counter Offer
 // ============================================
-import { game, dom } from './game.js?v=104';
+import { game, dom } from './game.js?v=106';
 import { fmt, fmtDisplayBoard, logEvent } from './helpers.js?v=120';
 import { renderGrid } from './render.js?v=111';
 import { updateStatus } from './center-stage.js?v=108';

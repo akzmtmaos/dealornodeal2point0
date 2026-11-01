@@ -1,7 +1,7 @@
 // ============================================
 // Center-stage opening animation
 // ============================================
-import { game, dom } from './game.js?v=104';
+import { game, dom } from './game.js?v=106';
 import { setBriefcaseAmount, isBigValue, isLowValue, isHighestRemaining, triggerDangerFlash, triggerYellowFlash } from './helpers.js?v=120';
 import { caseInnerMarkup, flashTableShelves, clearShelfFlash } from './render.js?v=111';
 import { applyInteriorBg, getInteriorBgId, applyInteriorAmountStyling } from './customization.js?v=121';

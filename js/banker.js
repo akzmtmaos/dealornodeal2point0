@@ -1,7 +1,7 @@
 // ============================================
 // Banker Offer
 // ============================================
-import { game, dom } from './game.js?v=104';
+import { game, dom } from './game.js?v=106';
 import { fmt, fmtDisplayBoard, logEvent, remainingAmountValues } from './helpers.js?v=120';
 import { renderGrid, renderAll, eliminateBoardValue, blinkTableShelves } from './render.js?v=111';
 import { revealCaseAnimated, updateStatus, hideAll } from './center-stage.js?v=108';

@@ -708,3 +708,159 @@
     60%{transform:scale(1.06);opacity:1;}
     100%{transform:scale(1);}
   }
+
+  /* ---------- Color Controller ---------- */
+  /* Curated rooms: each card paints the palette's background behind a strip of
+     its two shelf colours plus the accent that flows along the rails. */
+  .color-panel{
+    position:fixed;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:100;
+    background:rgba(0,0,0,0.45);
+    animation:modalIn .2s ease;
+  }
+  .color-card{
+    width:min(92vw,430px);
+    max-height:80vh;
+    display:flex;
+    flex-direction:column;
+    background:linear-gradient(180deg,var(--bg-panel-2),var(--bg-panel));
+    border:1px solid rgba(231,187,77,0.25);
+    border-radius:12px;
+    padding:16px;
+    box-shadow:var(--shadow-deep);
+    animation:modalIn .25s ease;
+  }
+  .color-grid{
+    flex:1;
+    min-height:0;
+    overflow-y:auto;
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    /* fixed rows: five rows of rooms scroll instead of being squeezed flat */
+    grid-auto-rows:88px;
+    align-content:start;
+    gap:10px;
+    padding:2px;
+  }
+  .color-theme{
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    gap:0;
+    padding:0;
+    border-radius:10px;
+    border:2px solid rgba(255,255,255,0.08);
+    background:rgba(255,255,255,0.02);
+    cursor:pointer;
+    overflow:hidden;
+    font-family:'Oswald',sans-serif;
+    transition:border-color .2s, transform .15s, box-shadow .2s;
+  }
+  .color-theme:hover{
+    border-color:rgba(231,187,77,0.5);
+    transform:translateY(-1px);
+  }
+  .color-theme.active{
+    border-color:var(--gold);
+    box-shadow:0 0 0 1px rgba(231,187,77,0.35), 0 6px 18px rgba(0,0,0,0.45);
+  }
+  .color-theme-preview{
+    display:block;
+    position:relative;
+    width:100%;
+    /* fixed, non-shrinking: the grid scrolls instead of squeezing the rooms */
+    flex:0 0 62px;
+    height:62px;
+  }
+  .color-theme-bars{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:10px;
+    display:flex;
+    height:6px;
+  }
+  .color-theme-bars span{flex:1;}
+  .color-theme-bars span:first-child{flex:2;}
+  .color-theme-bars span:last-child{flex:1.5;}
+  .color-theme-name{
+    display:block;
+    flex:0 0 auto;
+    padding:6px 8px;
+    font-size:0.62rem;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--muted);
+    text-align:left;
+  }
+  .color-theme.active .color-theme-name{color:var(--gold);}
+
+  /* Color Controller: the hand-mixed paints, MS Paint style. */
+  .color-custom{
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px solid rgba(139,147,168,0.18);
+  }
+  .color-custom-title{
+    font-family:'Oswald',sans-serif;
+    font-size:0.6rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:8px;
+  }
+  .color-custom-row{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+  }
+  .color-field{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    cursor:pointer;
+  }
+  .color-field > span{
+    font-family:'Inter',sans-serif;
+    font-size:0.6rem;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  .color-field > b{
+    font-family:'Inter',sans-serif;
+    font-size:0.58rem;
+    font-weight:500;
+    color:var(--ivory);
+    opacity:0.75;
+    letter-spacing:0.02em;
+  }
+  .color-field input[type="color"]{
+    -webkit-appearance:none;
+    appearance:none;
+    width:100%;
+    height:30px;
+    padding:0;
+    border:1px solid rgba(139,147,168,0.3);
+    border-radius:7px;
+    background:none;
+    cursor:pointer;
+    transition:border-color .15s, transform .1s;
+  }
+  .color-field input[type="color"]:hover{
+    border-color:var(--gold-dim);
+    transform:translateY(-1px);
+  }
+  .color-field input[type="color"]::-webkit-color-swatch-wrapper{padding:3px;}
+  .color-field input[type="color"]::-webkit-color-swatch{
+    border:none;
+    border-radius:5px;
+  }
+  .color-field input[type="color"]::-moz-color-swatch{
+    border:none;
+    border-radius:5px;
+  }

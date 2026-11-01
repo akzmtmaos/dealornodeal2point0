@@ -7,7 +7,7 @@
    either by pasting an image link or by copying an image and pressing Ctrl+V on
    a row. Pasted images are shrunk to a thumbnail data URL so a full set still
    fits comfortably in localStorage. */
-import { game, dom } from './game.js?v=104';
+import { game, dom } from './game.js?v=106';
 import { logEvent } from './helpers.js?v=120';
 
 const STORAGE_KEY = 'dnd_model_images';

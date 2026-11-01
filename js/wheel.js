@@ -7,7 +7,7 @@
    a near-fair one takes most of the wheel. The spin is weighted by the slices,
    so the wheel's odds are the odds you actually get, and the disc is aimed into
    the winning slice. */
-import { game, dom } from './game.js?v=104';
+import { game, dom } from './game.js?v=106';
 import { logEvent, fmt } from './helpers.js?v=120';
 import { computeOffer } from './banker.js?v=115';
 

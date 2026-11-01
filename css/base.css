@@ -25,15 +25,22 @@
     --board-bg:#141414;
     --board-frame:#232323;
 
+    /* Colour Controller: the room's background, the two shelf colours (good
+       news and bad news) and the accent stripe that flows along the rails. */
+    --app-bg:
+      radial-gradient(ellipse 1200px 600px at 50% -10%, rgba(95,168,211,0.14), transparent 60%),
+      radial-gradient(ellipse 900px 500px at 50% 110%, rgba(255,204,51,0.06), transparent 60%),
+      #04060d;
+    --shelf-a:#ffd84d;
+    --shelf-b:#ff3b3b;
+    --shelf-accent:#2b6fff;
+
     --shadow-deep:0 20px 50px rgba(0,0,0,0.55);
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
-    background:
-      radial-gradient(ellipse 1200px 600px at 50% -10%, rgba(95,168,211,0.14), transparent 60%),
-      radial-gradient(ellipse 900px 500px at 50% 110%, rgba(255,204,51,0.06), transparent 60%),
-      var(--bg-deep);
+    background:var(--app-bg);
     color:var(--ivory);
     font-family:'Inter',sans-serif;
     min-height:100vh;

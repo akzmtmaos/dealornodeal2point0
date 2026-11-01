@@ -1,7 +1,7 @@
 // ============================================
 // End Game
 // ============================================
-import { game, dom } from './game.js?v=104';
+import { game, dom } from './game.js?v=106';
 import { fmt } from './helpers.js?v=120';
 import { renderAll } from './render.js?v=111';
 import { triggerDangerFlash } from './helpers.js?v=120';

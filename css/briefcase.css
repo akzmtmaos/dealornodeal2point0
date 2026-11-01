@@ -75,7 +75,7 @@
     position:absolute;
     top:calc(100% + 2px);
     height:6px;
-    background:repeating-linear-gradient(90deg, #ffd84d 0, #2b6fff 25%, #ffd84d 50%);
+    background:repeating-linear-gradient(90deg, var(--shelf-a) 0, var(--shelf-accent) 25%, var(--shelf-a) 50%);
     background-size:200% 100%;
     box-shadow:0 2px 6px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.35);
   }
@@ -118,7 +118,7 @@
     position:absolute;
     top:0;
     height:100%;
-    background:repeating-linear-gradient(90deg, #ffd84d 0, #2b6fff 25%, #ffd84d 50%);
+    background:repeating-linear-gradient(90deg, var(--shelf-a) 0, var(--shelf-accent) 25%, var(--shelf-a) 50%);
     background-size:200% 100%;
     box-shadow:0 2px 6px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.35);
   }
@@ -140,7 +140,7 @@
     position:absolute;
     top:0;
     height:100%;
-    background:repeating-linear-gradient(90deg, #ffd84d 0, #2b6fff 25%, #ffd84d 50%);
+    background:repeating-linear-gradient(90deg, var(--shelf-a) 0, var(--shelf-accent) 25%, var(--shelf-a) 50%);
     background-size:200% 100%;
     box-shadow:0 2px 6px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.35);
   }
@@ -171,7 +171,7 @@
   .case-grid.shelf-flash-yellow .case-shelf-back::after,
   .case-grid.shelf-flash-yellow .case-shelf-top::before,
   .case-grid.shelf-flash-yellow .case-shelf-top::after{
-    background:#ffd84d;
+    background:var(--shelf-a);
     background-size:auto;
   }
   /* Banker call: the rails blink yellow in time with the phone rings. */
@@ -182,7 +182,7 @@
   .case-grid.shelf-blink-yellow .case-shelf-back::after,
   .case-grid.shelf-blink-yellow .case-shelf-top::before,
   .case-grid.shelf-blink-yellow .case-shelf-top::after{
-    background:#ffd84d;
+    background:var(--shelf-a);
     background-size:auto;
   }
   .case-grid.shelf-red-all .case-row::before,
@@ -192,7 +192,7 @@
   .case-grid.shelf-red-all .case-shelf-back::after,
   .case-grid.shelf-red-all .case-shelf-top::before,
   .case-grid.shelf-red-all .case-shelf-top::after{
-    background:#ff3b3b;
+    background:var(--shelf-b);
     background-size:auto;
   }
 

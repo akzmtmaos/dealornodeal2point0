@@ -62,6 +62,7 @@
   <button class="emoji-btn" id="resetValuesBtn" title="Reset">↻</button>
   <button class="emoji-btn" id="shuffleBtn" title="Shuffle">🔀</button>
   <button class="settings-gear pb-select-btn" id="bgPickerBtn" title="Customization" aria-label="Customization">🎨</button>
+  <button class="settings-gear pb-select-btn" id="colorBtn" title="Color Controller — background and shelf colours" aria-label="Color Controller">🖌️</button>
   <button class="settings-gear pb-select-btn" id="modelsBtn" title="Custom Models — add a picture per case" aria-label="Custom Models">🖼️</button>
 </div>
 <div class="settings-panel" id="settingsPanel" style="display:none;">
@@ -172,6 +173,37 @@
     <div class="pb-save-row" style="margin-top:10px;">
       <button class="btn primary" id="wheelSpinBtn">Spin</button>
       <button class="btn" id="closeWheelBtn">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="color-panel" id="colorPanel" style="display:none;" onclick="if(event.target===this)this.style.display='none'">
+  <div class="color-card">
+    <div class="settings-title">🖌️ Color Controller</div>
+    <p class="models-hint">The room's background, the good-news shelf and the bad-news shelf, chosen to sit together. Pick a set and the whole board follows.</p>
+    <div class="color-grid" id="colorGrid"></div>
+    <div class="color-custom">
+      <div class="color-custom-title">Mix your own</div>
+      <div class="color-custom-row">
+        <label class="color-field">
+          <span>Background</span>
+          <input type="color" id="customBgInput">
+          <b id="customBgHex">#04060d</b>
+        </label>
+        <label class="color-field">
+          <span>Good shelf</span>
+          <input type="color" id="customGoodInput">
+          <b id="customGoodHex">#ffd84d</b>
+        </label>
+        <label class="color-field">
+          <span>Bad shelf</span>
+          <input type="color" id="customBadInput">
+          <b id="customBadHex">#ff3b3b</b>
+        </label>
+      </div>
+    </div>
+    <div class="pb-save-row" style="margin-top:12px;">
+      <button class="btn primary" id="closeColorBtn">Done</button>
     </div>
   </div>
 </div>
@@ -316,7 +348,7 @@
     } else {
       var s = document.createElement('script');
       s.type = 'module';
-      s.src = 'js/main.js?v=38';
+      s.src = 'js/main.js?v=40';
       document.body.appendChild(s);
     }
   })();

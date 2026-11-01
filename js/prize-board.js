@@ -1,7 +1,7 @@
 // ============================================
 // Prize Board Selection
 // ============================================
-import { game, dom, MIN_CASE_COUNT, MAX_CASE_COUNT } from './game.js?v=104';
+import { game, dom, MIN_CASE_COUNT, MAX_CASE_COUNT } from './game.js?v=106';
 import { buildSchedule, logEvent } from './helpers.js?v=120';
 import { renderAll } from './render.js?v=111';
 import { flashBoard } from './toolbar.js?v=111';
