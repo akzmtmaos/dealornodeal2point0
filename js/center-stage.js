@@ -3,7 +3,7 @@
 // ============================================
 import { game, dom } from './game.js?v=102';
 import { setBriefcaseAmount, isBigValue, isLowValue, isHighestRemaining, triggerDangerFlash, triggerYellowFlash } from './helpers.js?v=120';
-import { caseInnerMarkup, flashTableShelves, clearShelfFlash } from './render.js?v=110';
+import { caseInnerMarkup, flashTableShelves, clearShelfFlash } from './render.js?v=111';
 import { applyInteriorBg, getInteriorBgId, applyInteriorAmountStyling } from './customization.js?v=121';
 import { revealSoundLow, revealSoundHigh, playRevealSound, startTensionRoll, stopBankerRingLoop } from './sound.js?v=110';
 
@@ -55,6 +55,10 @@ export const CONTINUE_PAUSE_MS = 700;
 export function revealCaseAnimated(n, label, callback, dangerAware, onCancel, revealSoundOverride) {
   const idx = game.caseAssignment[n - 1];
   const value = game.amounts[idx].value;
+  // Bad news is judged against the board, not a fixed line: a $100K+ amount
+  // always hurts, and so does the biggest amount left when the whole remaining
+  // board has fallen below $100K (knocking out the only $50K when $5 and $100
+  // sit beside it). Anything else is good news.
   const isDanger = !!dangerAware && (isBigValue(value) || isHighestRemaining(value));
   const isLow = !!dangerAware && !isDanger && isLowValue(value);
   const gridBtn = dom.caseGrid.querySelector(`.briefcase[data-num="${n}"]`);
@@ -109,13 +113,22 @@ export function revealCaseAnimated(n, label, callback, dangerAware, onCancel, re
     } else if (isLow) {
       triggerYellowFlash();
     }
-    // The case table reacts to the value that was just revealed...
-    flashTableShelves(value);
-    // Final reveals use the decision outcome; normal reveals use value tiers.
+    // The case table reacts with the same verdict as the flash and the sting,
+    // so a red case and a red-railed table never disagree.
+    flashTableShelves(value, isDanger);
+    // Final reveals use the decision outcome; normal reveals use the verdict
+    // worked out above, which reads the amount against what is still on the
+    // board — eliminating the biggest amount left hurts even when every
+    // remaining amount is small. Only reveals that are not judged against the
+    // board (dangerAware off) fall back to the plain $100K tiers.
     if (revealSoundOverride === 'good') {
       revealSoundLow();
     } else if (revealSoundOverride === 'bad') {
       revealSoundHigh();
+    } else if (isDanger) {
+      revealSoundHigh();
+    } else if (isLow) {
+      revealSoundLow();
     } else {
       playRevealSound(value);
     }

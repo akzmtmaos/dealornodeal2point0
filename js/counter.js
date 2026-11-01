@@ -3,8 +3,8 @@
 // ============================================
 import { game, dom } from './game.js?v=102';
 import { fmt, fmtDisplayBoard, logEvent } from './helpers.js?v=120';
-import { renderGrid } from './render.js?v=110';
-import { updateStatus } from './center-stage.js?v=107';
+import { renderGrid } from './render.js?v=111';
+import { updateStatus } from './center-stage.js?v=108';
 import { acceptOffer, renderOffersHistory, showFinalDecision } from './banker.js?v=115';
 
 export function revealCounterDecision() {

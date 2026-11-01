@@ -3,8 +3,8 @@
 // ============================================
 import { game, dom } from './game.js?v=102';
 import { fmt, fmtDisplayBoard, logEvent, remainingAmountValues } from './helpers.js?v=120';
-import { renderGrid, renderAll, eliminateBoardValue, blinkTableShelves } from './render.js?v=110';
-import { revealCaseAnimated, updateStatus, hideAll } from './center-stage.js?v=107';
+import { renderGrid, renderAll, eliminateBoardValue, blinkTableShelves } from './render.js?v=111';
+import { revealCaseAnimated, updateStatus, hideAll } from './center-stage.js?v=108';
 import { showFinalDecision } from './final.js?v=117';
 import { endGame } from './end.js?v=115';
 import { revealCounterDecision } from './counter.js?v=107';

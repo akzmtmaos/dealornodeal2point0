@@ -4,7 +4,7 @@
 import { game, dom } from './game.js?v=102';
 import { offerStripTickSound } from './sound.js?v=110';
 import { formatNumber } from './helpers.js?v=120';
-import { renderBoard } from './render.js?v=110';
+import { renderBoard } from './render.js?v=111';
 
 /* ---------- Case Interior Background ---------- */
 const BG_OPTIONS = [

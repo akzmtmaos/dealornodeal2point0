@@ -17,7 +17,7 @@ import './customization.js?v=121';
 import { game, dom } from './game.js?v=102';
 import { initValues, newGame } from './init.js?v=110';
 import { initModels } from './models.js?v=2';
-import { renderGrid } from './render.js?v=110';
+import { renderGrid } from './render.js?v=111';
 
 // ---- Go ----
 dom.caseCountInput.value = dom.caseCountInput.defaultValue;

@@ -4,8 +4,8 @@
 import { game, dom } from './game.js?v=102';
 import { MIN_CASE_COUNT, MAX_CASE_COUNT } from './game.js?v=102';
 import { logEvent, fmtDisplayBoard } from './helpers.js?v=120';
-import { renderGrid, renderYourCase } from './render.js?v=110';
-import { refreshCurrencyDisplay } from './render.js?v=110';
+import { renderGrid, renderYourCase } from './render.js?v=111';
+import { refreshCurrencyDisplay } from './render.js?v=111';
 import { applySfxLevel } from './sound.js?v=110';
 import { newGame } from './init.js?v=110';
 import { setModelsEnabled, setFixedCaseModelDisabled } from './models.js?v=2';

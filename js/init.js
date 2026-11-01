@@ -3,10 +3,10 @@
 // ============================================
 import { game, dom } from './game.js?v=102';
 import { getValuesForCount, buildSchedule, shuffleArr, logEvent, resetGameLog } from './helpers.js?v=120';
-import { renderAll, renderGrid, renderBoard, updateToolbar } from './render.js?v=110';
+import { renderAll, renderGrid, renderBoard, updateToolbar } from './render.js?v=111';
 import { renderOffersHistory } from './banker.js?v=115';
 import { reshuffleModels } from './models.js?v=2';
-import { hideAll } from './center-stage.js?v=107';
+import { hideAll } from './center-stage.js?v=108';
 
 export function initValues() {
   game.amounts = getValuesForCount(game.caseCount).map(v => ({ value: v, eliminated: false }));

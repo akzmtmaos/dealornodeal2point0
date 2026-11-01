@@ -3,7 +3,7 @@
 // ============================================
 import { game, dom } from './game.js?v=102';
 import { fmt } from './helpers.js?v=120';
-import { renderAll } from './render.js?v=110';
+import { renderAll } from './render.js?v=111';
 import { triggerDangerFlash } from './helpers.js?v=120';
 import { newGame } from './init.js?v=110';
 

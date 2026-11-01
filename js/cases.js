@@ -3,10 +3,10 @@
 // ============================================
 import { game, dom } from './game.js?v=102';
 import { fmt, logEvent } from './helpers.js?v=120';
-import { renderGrid, renderYourCase, renderAll, eliminateBoardValue } from './render.js?v=110';
-import { revealCaseAnimated, finishPendingReveal, CONTINUE_PAUSE_MS } from './center-stage.js?v=107';
+import { renderGrid, renderYourCase, renderAll, eliminateBoardValue } from './render.js?v=111';
+import { revealCaseAnimated, finishPendingReveal, CONTINUE_PAUSE_MS } from './center-stage.js?v=108';
 import { triggerBankerOffer, triggerHypotheticalOffer } from './banker.js?v=115';
-import { updateStatus } from './center-stage.js?v=107';
+import { updateStatus } from './center-stage.js?v=108';
 
 export function onCaseClick(n) {
   if (game.state === 'setup' && game.yourCase === null) {

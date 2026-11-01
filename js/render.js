@@ -321,17 +321,21 @@ export function updateToolbar() {
 }
 
 /** Washes the whole case table's shelf rails a single solid color the moment
- *  a case value is revealed: all yellow for values below $100K, all red for
- *  $100K and up. The wash holds until the reveal is dismissed — the Continue
- *  button in manual mode, or the end of the stage animation otherwise — so the
- *  result stays readable instead of vanishing on a timer. The gradient loops
- *  keep running underneath, so the rails resume seamlessly once it lifts. */
-export function flashTableShelves(value) {
+ *  a case value is revealed: all red when the elimination was bad news, all
+ *  yellow when it was good news. `isDanger` carries the caller's verdict, which
+ *  is judged against the amounts still on the board; when it is omitted the
+ *  rails fall back to the plain $100K tier. The wash holds until the reveal is
+ *  dismissed — the Continue button in manual mode, or the end of the stage
+ *  animation otherwise — so the result stays readable instead of vanishing on a
+ *  timer. The gradient loops keep running underneath, so the rails resume
+ *  seamlessly once it lifts. */
+export function flashTableShelves(value, isDanger) {
   dom.caseGrid.classList.remove('shelf-red-all', 'shelf-flash-yellow');
-  if (value < 100000) {
-    dom.caseGrid.classList.add('shelf-flash-yellow');
-  } else {
+  const danger = typeof isDanger === 'boolean' ? isDanger : value >= 100000;
+  if (danger) {
     dom.caseGrid.classList.add('shelf-red-all');
+  } else {
+    dom.caseGrid.classList.add('shelf-flash-yellow');
   }
 }
 
