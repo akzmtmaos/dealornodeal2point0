@@ -14,15 +14,17 @@ import './randomizer2.js?v=2';
 import './customization.js?v=121';
 
 // Import init for startup
-import { game, dom } from './game.js?v=102';
+import { game, dom } from './game.js?v=104';
 import { initValues, newGame } from './init.js?v=110';
 import { initModels } from './models.js?v=2';
+import { initWheel } from './wheel.js?v=8';
 import { renderGrid } from './render.js?v=111';
 
 // ---- Go ----
 dom.caseCountInput.value = dom.caseCountInput.defaultValue;
 // Models load first so the very first grid render already has its pictures.
 initModels();
+initWheel();
 initValues();
 newGame();
 

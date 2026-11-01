@@ -1,7 +1,7 @@
 // ============================================
 // Suggest: Random Elimination Order
 // ============================================
-import { game, dom } from './game.js?v=102';
+import { game, dom } from './game.js?v=104';
 
 function generateSuggestion() {
   dom.suggestBody.innerHTML = '';

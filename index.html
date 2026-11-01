@@ -56,6 +56,7 @@
   <button class="board-save-btn" id="boardSaveBtn" title="Save to Prize Board Selection">💾</button>
   <button class="settings-gear pb-select-btn" id="suggestBtn" title="Suggest Elimination Order" aria-label="Suggest Elimination Order">🎲</button>
   <button class="settings-gear pb-select-btn" id="randomizer2Btn" title="Randomizer Beta Test 2 — highlight what to open" aria-label="Randomizer Beta Test 2">🎯</button>
+  <button class="settings-gear pb-select-btn" id="wheelBtn" title="Wheel Decider — spin for Deal or No Deal" aria-label="Wheel Decider">🎡</button>
   <button class="emoji-btn" id="editToggle" title="Edit Values">✎</button>
   <button class="emoji-btn" id="saveValuesBtn" title="Save Values">💾</button>
   <button class="emoji-btn" id="resetValuesBtn" title="Reset">↻</button>
@@ -150,6 +151,27 @@
     <div class="models-list" id="modelsList"></div>
     <div class="pb-save-row" style="margin-top:12px;">
       <button class="btn primary" id="closeModelsBtn">Done</button>
+    </div>
+  </div>
+</div>
+
+<div class="wheel-panel" id="wheelPanel" style="display:none;" onclick="if(event.target===this)this.style.display='none'">
+  <div class="wheel-card">
+    <div class="settings-title">🎡 Wheel Decider</div>
+    <p class="models-hint">Can't make up your mind? The <b>Deal</b> slice grows every round — spin for a verdict.</p>
+    <div class="wheel-stage">
+      <div class="wheel-pointer"></div>
+      <div class="wheel-disc" id="wheelDisc">
+        <span class="wheel-label" id="wheelDealLabel">DEAL</span>
+        <span class="wheel-label" id="wheelNoDealLabel">NO DEAL</span>
+      </div>
+      <div class="wheel-hub"></div>
+    </div>
+    <div class="wheel-odds" id="wheelOdds">Round 1</div>
+    <div class="wheel-result" id="wheelResult" aria-live="polite">Spin to decide</div>
+    <div class="pb-save-row" style="margin-top:10px;">
+      <button class="btn primary" id="wheelSpinBtn">Spin</button>
+      <button class="btn" id="closeWheelBtn">Close</button>
     </div>
   </div>
 </div>
@@ -294,7 +316,7 @@
     } else {
       var s = document.createElement('script');
       s.type = 'module';
-      s.src = 'js/main.js?v=37';
+      s.src = 'js/main.js?v=38';
       document.body.appendChild(s);
     }
   })();

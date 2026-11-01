@@ -1,7 +1,7 @@
 // ============================================
 // Toolbar actions
 // ============================================
-import { game, dom } from './game.js?v=102';
+import { game, dom } from './game.js?v=104';
 import { getValuesForCount } from './helpers.js?v=120';
 import { renderBoard, renderAll, updateToolbar } from './render.js?v=111';
 import { assignCases } from './init.js?v=110';

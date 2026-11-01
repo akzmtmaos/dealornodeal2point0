@@ -1,7 +1,7 @@
 // ============================================
 // Final Decision
 // ============================================
-import { game, dom } from './game.js?v=102';
+import { game, dom } from './game.js?v=104';
 import { logEvent, fmt } from './helpers.js?v=120';
 import { renderGrid, eliminateBoardValue } from './render.js?v=111';
 import { revealCaseAnimated } from './center-stage.js?v=108';

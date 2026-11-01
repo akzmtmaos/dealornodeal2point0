@@ -1,7 +1,7 @@
 // ============================================
 // Rendering
 // ============================================
-import { game, dom } from './game.js?v=102';
+import { game, dom } from './game.js?v=104';
 import { fmtDisplayBoard, fmtDisplayBriefcase, getCaseGridRows, getModelGridRows, formatNumber, setBriefcaseAmount } from './helpers.js?v=120';
 import { onCaseClick } from './cases.js?v=108';
 import { applyInteriorBg, getInteriorBgId, getBoardBgId, applyInteriorAmountStyling, wrapValueSquares, refreshCaseCountStrip } from './customization.js?v=121';

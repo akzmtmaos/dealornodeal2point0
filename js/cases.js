@@ -1,7 +1,7 @@
 // ============================================
 // Case click logic
 // ============================================
-import { game, dom } from './game.js?v=102';
+import { game, dom } from './game.js?v=104';
 import { fmt, logEvent } from './helpers.js?v=120';
 import { renderGrid, renderYourCase, renderAll, eliminateBoardValue } from './render.js?v=111';
 import { revealCaseAnimated, finishPendingReveal, CONTINUE_PAUSE_MS } from './center-stage.js?v=108';

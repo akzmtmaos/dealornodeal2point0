@@ -1,8 +1,8 @@
 // ============================================
 // Settings gear
 // ============================================
-import { game, dom } from './game.js?v=102';
-import { MIN_CASE_COUNT, MAX_CASE_COUNT } from './game.js?v=102';
+import { game, dom } from './game.js?v=104';
+import { MIN_CASE_COUNT, MAX_CASE_COUNT } from './game.js?v=104';
 import { logEvent, fmtDisplayBoard } from './helpers.js?v=120';
 import { renderGrid, renderYourCase } from './render.js?v=111';
 import { refreshCurrencyDisplay } from './render.js?v=111';
