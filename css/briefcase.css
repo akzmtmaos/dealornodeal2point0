@@ -529,7 +529,7 @@
     width:calc(var(--model-case-w, 72px) * 0.82);
     height:calc(var(--model-case-w, 72px) * 0.82);
     margin-top:0;
-    border-radius:7px;
+    border-radius:0;
   }
   /* Custom Models makes each case narrower than a full 84px one, so the printed
      number has to scale with the case instead of spilling past its edges. With
@@ -548,7 +548,7 @@
     height:22px;
     margin-top:2px;
     flex:0 0 auto;
-    border-radius:6px;
+    border-radius:0; /* square corners: the picture reads as a plate, not an avatar */
     border:1px solid rgba(139,147,168,0.35);
     background:rgba(255,255,255,0.05);
     background-size:cover;
@@ -574,4 +574,24 @@
     font-size:0.72rem;
     opacity:0.3;
     filter:grayscale(1);
+  }
+
+  /* The picture square follows its case into shadow. Your own pick and already
+     opened cases dim by the same amount as the case beside them, the twin left
+     behind while the big copy plays center-stage fades harder, and during a
+     reveal every unopened case that is not in focus takes the same 0.45 bath.
+     A case removed from the shelf keeps its own rule above (the square fades
+     out entirely, so there is no bare picture left behind). */
+  .case-cell:has(> .briefcase.your-pick:not(.opened-hidden)) .model-avatar,
+  .case-cell:has(> .briefcase.opened:not(.opened-hidden)) .model-avatar{
+    opacity:0.42;
+    filter:brightness(0.48) saturate(0.4);
+  }
+  .case-cell:has(> .briefcase.lifted) .model-avatar{
+    opacity:0.28;
+    filter:grayscale(0.6);
+  }
+  .case-grid.reveal-focus .case-cell:has(> .briefcase:not(.focus-case):not(.opened)) .model-avatar{
+    opacity:0.45;
+    filter:brightness(0.55) saturate(0.65);
   }
