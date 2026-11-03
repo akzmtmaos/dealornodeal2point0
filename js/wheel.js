@@ -2,21 +2,23 @@
 // Wheel Decider — a two-wedge wheel for Deal or No Deal
 // ============================================
 /* A tie-breaker, not a game rule. The wheel is split into DEAL and NO DEAL, but
-   not evenly: the DEAL slice is sized by how good the banker's offer is against
-   what is still on the board. A stingy 25%-of-the-board offer leaves a sliver,
-   a near-fair one takes most of the wheel. The spin is weighted by the slices,
+   not evenly: the DEAL slice is sized by the banker's actual offer against what
+   is still on the board. A stingy 25%-of-the-board offer leaves a sliver, a
+   near-fair one takes most of the wheel. The round number never enters into it —
+   only the dollars the banker put on the table. With no offer made, the wheel is
+   an honest 50/50 instead of guessing one. The spin is weighted by the slices,
    so the wheel's odds are the odds you actually get, and the disc is aimed into
    the winning slice. */
 import { game, dom } from './game.js?v=106';
 import { logEvent, fmt } from './helpers.js?v=120';
-import { computeOffer } from './banker.js?v=115';
 
 const SPIN_MS = 4200;          // how long the disc coasts
 const EXTRA_TURNS = 5;         // full turns before it settles, so the spin has travel
 const HALF_JITTER = 20;        // degrees either side of a slice centre, inside the slice
 const LABEL_RADIUS = 60;       // where the DEAL / NO DEAL words sit, in px from the hub
-const DEAL_MIN_SHARE = 0.06;   // an insulting offer: a sliver of wheel
-const DEAL_MAX_SHARE = 0.92;   // an offer above the board average: almost all of it
+const DEAL_MIN_SHARE = 0.04;   // an insulting offer: a sliver of wheel
+const DEAL_MAX_SHARE = 0.95;   // an offer above the board average: almost all of it
+const SHARE_CURVE = 1.6;       // low offers stay tiny, fair offers open right up
 
 let rotation = 0;              // accumulated disc rotation, in degrees
 let spinning = false;
@@ -24,27 +26,37 @@ let spinTimer = null;
 let spinEndTimer = null;
 let spinToken = 0;
 
-/** The banker's offer right now: the one on the table while his screen is up,
- *  otherwise the amount his own formula would offer for the board as it stands. */
+/** The offer the wheel measures against. Only real offers count: the one on the
+ *  table while the banker's screen is up, or the one he already made this round
+ *  (so the wheel keeps reading that same offer after you decline). Anything else
+ *  — no offer yet, or a fresh round — is `none`, and the wheel goes even. */
 function currentOffer() {
   const onTheTable = !!(dom.offerBackdrop && dom.offerBackdrop.classList.contains('show')) && game.lastOffer > 0;
-  return onTheTable
-    ? { amount: game.lastOffer, live: true }
-    : { amount: computeOffer(), live: false };
+  if (onTheTable) return { amount: game.lastOffer, source: 'live' };
+
+  const last = game.offerHistory[game.offerHistory.length - 1];
+  if (last && last.round === game.roundIndex + 1 && last.amount > 0) {
+    return { amount: last.amount, source: 'round' };
+  }
+
+  return { amount: 0, source: 'none' };
 }
 
 /** How much of the wheel DEAL owns right now: the offer measured against the
- *  average of the amounts still in play. Offers under ~15% of the board leave a
- *  sliver, an offer level with the average takes nearly the whole wheel. */
+ *  average of the amounts still in play. The curve is monotonic, so a smaller
+ *  offer always means a smaller slice than a bigger one: 25% of the board is a
+ *  11% sliver, half the board is ~33%, a near-fair offer takes ~70%. */
 function dealShareNow() {
   const remaining = game.amounts.filter(a => !a.eliminated).map(a => a.value);
   const ev = remaining.length ? remaining.reduce((sum, v) => sum + v, 0) / remaining.length : 0;
   const offer = currentOffer();
-  if (!(ev > 0)) return { share: 0.5, ratio: 0, offer: offer.amount, live: offer.live, ev };
+  const even = { share: 0.5, ratio: 0, offer: 0, source: 'none', ev };
+  if (offer.source === 'none' || !(ev > 0)) return even;
 
   const ratio = offer.amount / ev;
-  const share = Math.min(DEAL_MAX_SHARE, Math.max(DEAL_MIN_SHARE, (ratio - 0.15) * 1.1));
-  return { share, ratio, offer: offer.amount, live: offer.live, ev };
+  const shaped = Math.pow(ratio, SHARE_CURVE);
+  const share = Math.min(DEAL_MAX_SHARE, Math.max(DEAL_MIN_SHARE, shaped));
+  return { share, ratio, offer: offer.amount, source: offer.source, ev };
 }
 
 /** Puts one word in the middle of its slice, upright in the disc's frame. A
@@ -61,7 +73,7 @@ function placeLabel(el, angleDeg, sliceDeg) {
 
 /** Repaints the wedges and labels for the offer in front of the player. */
 function applyWheel() {
-  const { share, ratio, offer, live } = dealShareNow();
+  const { share, ratio, offer, source } = dealShareNow();
   const dealDeg = share * 360;
   const dealMid = dealDeg / 2;
   const noDealMid = dealDeg + (360 - dealDeg) / 2;
@@ -76,9 +88,11 @@ function applyWheel() {
   placeLabel(dom.wheelDealLabel, dealMid, dealDeg);
   placeLabel(dom.wheelNoDealLabel, noDealMid, 360 - dealDeg);
 
-  dom.wheelOdds.textContent = live
-    ? `${fmt(offer)} offer · ${Math.round(ratio * 100)}% of the board · Deal ${Math.round(share * 100)}%`
-    : `No offer yet · Deal ${Math.round(share * 100)}%`;
+  dom.wheelOdds.textContent = source === 'none'
+    ? 'No offer on the table · even odds'
+    : `${fmt(offer)} offer · ${Math.round(ratio * 100)}% of the board · Deal ${Math.round(
+        share * 100
+      )}%`;
 }
 
 function openPanel() {

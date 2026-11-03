@@ -17,7 +17,7 @@ import './customization.js?v=121';
 import { game, dom } from './game.js?v=106';
 import { initValues, newGame } from './init.js?v=110';
 import { initModels } from './models.js?v=2';
-import { initWheel } from './wheel.js?v=8';
+import { initWheel } from './wheel.js?v=9';
 import { initColorController } from './color-controller.js?v=2';
 import { renderGrid } from './render.js?v=111';
 
