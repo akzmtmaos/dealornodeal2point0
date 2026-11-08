@@ -2,9 +2,9 @@
 // Center-stage opening animation
 // ============================================
 import { game, dom } from './game.js?v=106';
-import { setBriefcaseAmount, isBigValue, isLowValue, isHighestRemaining, triggerDangerFlash, triggerYellowFlash } from './helpers.js?v=121';
-import { caseInnerMarkup, flashTableShelves, clearShelfFlash } from './render.js?v=112';
-import { applyInteriorBg, getInteriorBgId, applyInteriorAmountStyling } from './customization.js?v=122';
+import { setBriefcaseAmount, isBigValue, isLowValue, isHighestRemaining, triggerDangerFlash, triggerYellowFlash } from './helpers.js?v=123';
+import { caseInnerMarkup, flashTableShelves, clearShelfFlash } from './render.js?v=113';
+import { applyInteriorBg, getInteriorBgId, applyInteriorAmountStyling } from './customization.js?v=125';
 import { revealSoundLow, revealSoundHigh, playRevealSound, startTensionRoll, stopBankerRingLoop } from './sound.js?v=111';
 
 export function hideAll() {

@@ -326,6 +326,9 @@
     display:inline-flex;align-items:center;justify-content:center;
     width:max-content;
     max-width:82%;
+    /* A value the type can no longer shrink enough to fit is clipped at the
+       plate instead of spilling out of the case. */
+    overflow:hidden;
     font-family:'Michroma',sans-serif;
     font-weight:400;
     font-size:2rem;

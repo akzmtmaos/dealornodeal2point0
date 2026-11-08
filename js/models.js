@@ -8,7 +8,7 @@
    a row. Pasted images are shrunk to a thumbnail data URL so a full set still
    fits comfortably in localStorage. */
 import { game, dom } from './game.js?v=106';
-import { logEvent } from './helpers.js?v=121';
+import { logEvent } from './helpers.js?v=123';
 
 const STORAGE_KEY = 'dnd_model_images';
 const THUMB_SIZE = 96;          // pasted pictures are cropped to this square

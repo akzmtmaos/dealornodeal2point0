@@ -49,10 +49,37 @@ export function parsePrizeInput(raw) {
   return text;
 }
 
+/* A value wider than its case (10,000,000, or a prize name like NOTHING) would
+   run past the case's value plate, so the type steps down until it fits. The
+   case keeps its size — only the text shrinks. */
+const CASE_VALUE_MIN_FONT = 3.5;
+function fitCaseValue(el) {
+  el.style.removeProperty('font-size');
+  const text = el.textContent.trim();
+  if (!text) return;
+  if (!el.clientWidth) {
+    // A case is filled before it is on the page, so there is nothing to measure
+    // yet — try again once the grid has laid it out.
+    if (!el.dataset.fitRetry) {
+      el.dataset.fitRetry = '1';
+      setTimeout(() => { delete el.dataset.fitRetry; if (el.isConnected) fitCaseValue(el); }, 0);
+    }
+    return;
+  }
+  const base = parseFloat(getComputedStyle(el).fontSize) || 8;
+  let size = base;
+  for (let i = 0; i < 8 && el.scrollWidth > el.clientWidth + 1; i++) {
+    size = Math.max(CASE_VALUE_MIN_FONT, size * ((el.clientWidth - 2) / Math.max(el.scrollWidth, 1)) * 0.98);
+    el.style.setProperty('font-size', size.toFixed(2) + 'px', 'important');
+    if (size <= CASE_VALUE_MIN_FONT) break;
+  }
+}
+
 export function setBriefcaseAmount(el, value) {
   el.replaceChildren();
   if (isPrizeText(value)) {
     el.appendChild(document.createTextNode(value));
+    fitCaseValue(el);
     return;
   }
   if (game.showCurrencyBriefcase) {
@@ -62,6 +89,7 @@ export function setBriefcaseAmount(el, value) {
     el.appendChild(currency);
   }
   el.appendChild(document.createTextNode(formatNumber(value)));
+  fitCaseValue(el);
 }
 
 /** Appends an entry to the bottom-right game log panel.

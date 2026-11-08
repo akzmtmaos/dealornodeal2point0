@@ -3,8 +3,8 @@
 // ============================================
 import { game, dom } from './game.js?v=106';
 import { offerStripTickSound } from './sound.js?v=111';
-import { formatNumber, isPrizeText } from './helpers.js?v=121';
-import { renderBoard } from './render.js?v=112';
+import { formatNumber, isPrizeText } from './helpers.js?v=123';
+import { renderBoard } from './render.js?v=113';
 
 /* ---------- Case Interior Background ---------- */
 const BG_OPTIONS = [
@@ -84,6 +84,32 @@ export function wrapValueSquares(el, pad) {
     }
     el.appendChild(span);
   }
+}
+
+/* A long prize name is wider than its plate, so the text is stepped down until
+   it sits inside one. The plate itself keeps the same width as the digit cells
+   around it — only the type shrinks. */
+const WORD_MIN_FONT = 3;
+/* Keep a little air either side of the word, so it never presses against the
+   plate's edge as it shrinks. */
+const WORD_SIDE_MARGIN = 4;
+export function fitWordPlates() {
+  document.querySelectorAll('#board .sq-word').forEach(plate => {
+    const word = plate.querySelector('.sq-char-value');
+    if (!word) return;
+    plate.style.fontSize = '';
+    const cs = getComputedStyle(plate);
+    const base = parseFloat(cs.fontSize) || 16.8;
+    const avail = plate.clientWidth - parseFloat(cs.paddingLeft || 0) - parseFloat(cs.paddingRight || 0);
+    const target = avail - WORD_SIDE_MARGIN * 2;
+    if (!(target > 0)) return;
+    let size = base;
+    for (let i = 0; i < 8 && word.offsetWidth > target; i++) {
+      size = Math.max(WORD_MIN_FONT, size * (target / Math.max(word.offsetWidth, 1)) * 0.99);
+      plate.style.fontSize = size.toFixed(2) + 'px';
+      if (size <= WORD_MIN_FONT) break;
+    }
+  });
 }
 
 /* ---------- Squares: Banker Offer tile ---------- */

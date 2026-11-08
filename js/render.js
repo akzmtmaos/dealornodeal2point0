@@ -2,9 +2,9 @@
 // Rendering
 // ============================================
 import { game, dom } from './game.js?v=106';
-import { fmtDisplayBoard, fmtDisplayBriefcase, getCaseGridRows, getModelGridRows, formatNumber, setBriefcaseAmount, isPrizeText, parsePrizeInput } from './helpers.js?v=121';
+import { fmtDisplayBoard, fmtDisplayBriefcase, getCaseGridRows, getModelGridRows, formatNumber, setBriefcaseAmount, isPrizeText, parsePrizeInput } from './helpers.js?v=123';
 import { onCaseClick } from './cases.js?v=108';
-import { applyInteriorBg, getInteriorBgId, getBoardBgId, applyInteriorAmountStyling, wrapValueSquares, refreshCaseCountStrip } from './customization.js?v=122';
+import { applyInteriorBg, getInteriorBgId, getBoardBgId, applyInteriorAmountStyling, wrapValueSquares, fitWordPlates, refreshCaseCountStrip } from './customization.js?v=125';
 import { refreshRandomizer2 } from './randomizer2.js?v=2';
 import { getModelImage } from './models.js?v=2';
 import { boardEliminateSound } from './sound.js?v=111';
@@ -257,6 +257,7 @@ export function renderBoard() {
   low.forEach(item => dom.boardColLow.appendChild(buildRow(item)));
   high.forEach(item => dom.boardColHigh.appendChild(buildRow(item)));
   equalizeRowWidths();
+  fitWordPlates();
 
   const rowsByValue = new Map();
   game.amounts.forEach((amount, idx) => {
