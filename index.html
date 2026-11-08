@@ -135,7 +135,16 @@
     <div class="pb-transfer-row">
       <button class="btn ghost" id="pbExportBtn" type="button">Export boards</button>
       <button class="btn ghost" id="pbImportBtn" type="button">Import boards</button>
+      <button class="btn ghost" id="pbPasteBtn" type="button">Paste JSON</button>
       <input id="pbImportFile" type="file" accept=".json,application/json" hidden>
+    </div>
+    <div class="pb-paste-panel" id="pbPastePanel" style="display:none;">
+      <div class="pb-paste-title">Load Prize Board through JSON Code</div>
+      <textarea id="pbPasteArea" class="pb-paste-area" spellcheck="false" placeholder='[100000000, 50000, "TRUCK", "NOTHING"] or {"name":"Big Money","values":[...]}'></textarea>
+      <div class="pb-save-row" style="margin-top:8px;">
+        <button class="btn primary" id="pbPasteLoadBtn" type="button">Load board</button>
+        <button class="btn ghost" id="pbPasteCancelBtn" type="button">Cancel</button>
+      </div>
     </div>
     <div class="pb-save-row" style="margin-top:12px;">
       <button class="btn primary" id="pbSaveConfirmBtn">Save</button>
