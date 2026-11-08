@@ -2,12 +2,12 @@
 // Rendering
 // ============================================
 import { game, dom } from './game.js?v=106';
-import { fmtDisplayBoard, fmtDisplayBriefcase, getCaseGridRows, getModelGridRows, formatNumber, setBriefcaseAmount } from './helpers.js?v=120';
+import { fmtDisplayBoard, fmtDisplayBriefcase, getCaseGridRows, getModelGridRows, formatNumber, setBriefcaseAmount, isPrizeText, parsePrizeInput } from './helpers.js?v=121';
 import { onCaseClick } from './cases.js?v=108';
-import { applyInteriorBg, getInteriorBgId, getBoardBgId, applyInteriorAmountStyling, wrapValueSquares, refreshCaseCountStrip } from './customization.js?v=121';
+import { applyInteriorBg, getInteriorBgId, getBoardBgId, applyInteriorAmountStyling, wrapValueSquares, refreshCaseCountStrip } from './customization.js?v=122';
 import { refreshRandomizer2 } from './randomizer2.js?v=2';
 import { getModelImage } from './models.js?v=2';
-import { boardEliminateSound } from './sound.js?v=110';
+import { boardEliminateSound } from './sound.js?v=111';
 
 export function renderAll() {
   renderGrid();
@@ -186,12 +186,21 @@ export function renderBoard() {
   dom.boardColHigh.innerHTML = '';
   const boardEl = dom.boardColLow.closest('.board');
   const boardSquareWidth = Math.max(7, ...game.amounts.map(({ value }) =>
-    formatNumber(value).replace(/,/g, '').length
+    isPrizeText(value) ? 0 : formatNumber(value).replace(/,/g, '').length
   ));
   boardEl.classList.toggle('board-squares-wide', boardSquareWidth > 7);
   game.boardRowEls = {};
   const withIndex = game.amounts.map((a, i) => ({ ...a, idx: i }));
-  withIndex.sort((a, b) => a.value - b.value || a.idx - b.idx);
+  // A prize name (TRUCK, NOTHING) has no amount to sort on, so the money keeps
+  // its usual ladder and the names trail after it, in the order they were
+  // entered.
+  withIndex.sort((a, b) => {
+    const aText = isPrizeText(a.value);
+    const bText = isPrizeText(b.value);
+    if (aText !== bText) return aText ? 1 : -1;
+    if (aText) return a.idx - b.idx;
+    return a.value - b.value || a.idx - b.idx;
+  });
   const mid = Math.ceil(withIndex.length / 2);
   const low = withIndex.slice(0, mid);
   const high = withIndex.slice(mid);
@@ -209,16 +218,15 @@ export function renderBoard() {
       row.appendChild(removedValue);
     }
     if (game.editMode && !item.eliminated && game.state === 'setup') {
+      // Free text: an amount, or a prize name like TRUCK / NOTHING.
       const input = document.createElement('input');
-      input.type = 'number';
-      input.min = '0';
-      input.step = 'any';
+      input.type = 'text';
       input.value = item.value;
       input.addEventListener('change', commitEdit);
       input.addEventListener('keydown', e => { if (e.key === 'Enter') input.blur(); });
       function commitEdit() {
-        const v = parseFloat(input.value);
-        if (!isNaN(v) && v >= 0) {
+        const v = parsePrizeInput(input.value);
+        if (v !== null) {
           game.amounts[item.idx].value = v;
         } else {
           input.value = game.amounts[item.idx].value; // revert invalid input, don't touch the rest of the board
@@ -227,7 +235,7 @@ export function renderBoard() {
         // board on every single edit would destroy other inputs mid-interaction.
       }
       row.appendChild(input);
-    } else if (game.showCurrencyBoard) {
+    } else if (game.showCurrencyBoard && !isPrizeText(item.value)) {
       const dollar = document.createElement('span');
       dollar.className = 'currency-sym';
       dollar.textContent = '$';

@@ -3,29 +3,58 @@
 // ============================================
 import { game, dom, STANDARD_VALUES } from './game.js?v=106';
 
+/** A board entry that is a prize rather than an amount — TRUCK, NOTHING, ... —
+ *  kept as text through the whole game. These get a single container on the
+ *  board and take no part in the banker's arithmetic. */
+export function isPrizeText(v) {
+  return typeof v === 'string' && v.trim() !== '';
+}
+
 export function formatNumber(v) {
+  if (isPrizeText(v)) return v;
   if (v < 1) return v.toFixed(2).replace(/^0(?=\.)/, '');
   return Math.round(v).toLocaleString('en-US');
 }
 
 export function fmt(v) {
+  if (isPrizeText(v)) return v;
   return '$' + formatNumber(v);
 }
 
 /** Prize board + banker offer amounts — respects the board currency setting. */
 export function fmtDisplayBoard(v) {
+  if (isPrizeText(v)) return v;
   const n = formatNumber(v);
   return game.showCurrencyBoard ? '$' + n : n;
 }
 
 /** Briefcase amounts — respects the briefcase currency setting. */
 export function fmtDisplayBriefcase(v) {
+  if (isPrizeText(v)) return v;
   const n = formatNumber(v);
   return game.showCurrencyBriefcase ? '$' + n : n;
 }
 
+/** Reads a board value typed into the edit field. A blank or negative entry
+ *  changes nothing (null); anything that is not a plain amount is kept as a
+ *  prize name, so the board can hold entries like TRUCK or NOTHING. */
+export function parsePrizeInput(raw) {
+  const text = String(raw == null ? '' : raw).trim();
+  if (!text) return null;
+  const numeric = text.replace(/[$,\s]/g, '');
+  if (/^\d*\.?\d+$/.test(numeric)) {
+    const n = parseFloat(numeric);
+    return Number.isFinite(n) ? n : null;
+  }
+  return text;
+}
+
 export function setBriefcaseAmount(el, value) {
   el.replaceChildren();
+  if (isPrizeText(value)) {
+    el.appendChild(document.createTextNode(value));
+    return;
+  }
   if (game.showCurrencyBriefcase) {
     const currency = document.createElement('span');
     currency.className = 'briefcase-currency';
@@ -155,20 +184,25 @@ export function getModelGridRows(count, perRow) {
 }
 
 export function isBigValue(v) {
-  return v >= 100000;
+  return typeof v === 'number' && v >= 100000;
 }
 
-/** Check if v is the highest value still in play (not eliminated). */
+/** Check if v is the highest amount still in play (not eliminated). Prize names
+ *  are not amounts, so they never count as the biggest thing left. */
 export function isHighestRemaining(v) {
-  const remaining = game.amounts.filter(a => !a.eliminated).map(a => a.value);
+  if (typeof v !== 'number') return false;
+  const remaining = game.amounts
+    .filter(a => !a.eliminated && typeof a.value === 'number')
+    .map(a => a.value);
   if (!remaining.length) return false;
   const maxVal = Math.max(...remaining);
   return v === maxVal;
 }
 
 export function isLowValue(v) {
-  // Good-news tier: everything below the $100K danger line.
-  return v < 100000;
+  // Good-news tier: everything below the $100K danger line. A prize name has no
+  // amount to judge, so it is never treated as bad news.
+  return typeof v !== 'number' || v < 100000;
 }
 
 export function shuffleArr(arr) {

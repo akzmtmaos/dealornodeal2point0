@@ -3,10 +3,10 @@
 // ============================================
 import { game, dom } from './game.js?v=106';
 import { MIN_CASE_COUNT, MAX_CASE_COUNT } from './game.js?v=106';
-import { logEvent, fmtDisplayBoard } from './helpers.js?v=120';
-import { renderGrid, renderYourCase } from './render.js?v=111';
-import { refreshCurrencyDisplay } from './render.js?v=111';
-import { applySfxLevel } from './sound.js?v=110';
+import { logEvent, fmtDisplayBoard } from './helpers.js?v=121';
+import { renderGrid, renderYourCase } from './render.js?v=112';
+import { refreshCurrencyDisplay } from './render.js?v=112';
+import { applySfxLevel } from './sound.js?v=111';
 import { newGame } from './init.js?v=110';
 import { setModelsEnabled, setFixedCaseModelDisabled } from './models.js?v=2';
 

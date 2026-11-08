@@ -2,8 +2,8 @@
 // Toolbar actions
 // ============================================
 import { game, dom } from './game.js?v=106';
-import { getValuesForCount } from './helpers.js?v=120';
-import { renderBoard, renderAll, updateToolbar } from './render.js?v=111';
+import { getValuesForCount, parsePrizeInput } from './helpers.js?v=121';
+import { renderBoard, renderAll, updateToolbar } from './render.js?v=112';
 import { assignCases } from './init.js?v=110';
 
 function pulseGrid() {
@@ -38,8 +38,8 @@ dom.editToggle.addEventListener('click', () => {
 dom.saveValuesBtn.addEventListener('click', () => {
   document.querySelectorAll('#board .amount-row input').forEach(input => {
     const idx = parseInt(input.closest('.amount-row').dataset.idx, 10);
-    const v = parseFloat(input.value);
-    if (!isNaN(v) && v >= 0) {
+    const v = parsePrizeInput(input.value);
+    if (v !== null) {
       game.amounts[idx].value = v;
     }
   });

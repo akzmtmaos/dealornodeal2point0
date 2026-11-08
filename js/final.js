@@ -2,8 +2,8 @@
 // Final Decision
 // ============================================
 import { game, dom } from './game.js?v=106';
-import { logEvent, fmt } from './helpers.js?v=120';
-import { renderGrid, eliminateBoardValue } from './render.js?v=111';
+import { logEvent, fmt } from './helpers.js?v=121';
+import { renderGrid, eliminateBoardValue } from './render.js?v=112';
 import { revealCaseAnimated } from './center-stage.js?v=108';
 import { endGame } from './end.js?v=115';
 

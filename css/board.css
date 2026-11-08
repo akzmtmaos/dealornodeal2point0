@@ -368,7 +368,8 @@
     transform:none !important;
     animation:none !important;
   }
-  .board.board-bg-squares .amount-row .removed-value .sq-char{
+  .board.board-bg-squares .amount-row .removed-value .sq-char,
+  .board.board-bg-squares .amount-row .removed-value .sq-word{
     background:transparent !important;
     box-shadow:none !important;
   }
@@ -413,6 +414,10 @@
     70%,100%{opacity:1;}
   }
   .board.board-bg-squares .amount-row.eliminating .sq-char{
+    animation:squaresCellGlow 2.0s linear forwards;
+  }
+  /* A prize name's single plate glows with the same animation as the cells. */
+  .board.board-bg-squares .amount-row.eliminating .sq-word{
     animation:squaresCellGlow 2.0s linear forwards;
   }
   /* Golden value stays visible while the container zooms, then hides at the
@@ -477,6 +482,32 @@
     transform-origin:center center;
     -webkit-text-stroke:0.35px #1a1608;
   }
+  /* A prize name (TRUCK, NOTHING) is one container: the whole word sits in a
+     single plate instead of one square per character. The plate stretches to
+     the full strip width, so it lines up with the rows of digit cells around
+     it rather than shrinking to the length of the word. */
+  .board.board-bg-squares .amount-row > span:has(.sq-word){
+    flex:1 1 auto;
+    min-width:0;
+  }
+  .board.board-bg-squares .amount-row .sq-word{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex:1 1 auto;
+    width:100%;
+    min-width:0;
+    height:25px;
+    padding:0 9px;
+    overflow:hidden;
+    background:linear-gradient(180deg,#fff07a 0%,#ffd84d 48%,#e8b72f 100%);
+    border-radius:2px;
+    box-shadow:inset 0 1px 2px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.1);
+    font-size:1.05rem;
+    font-weight:900;
+    line-height:1;
+    white-space:nowrap;
+  }
   /* Eliminated values keep the same square layout — the cells just go dark. */
   .board.board-bg-squares .amount-row.eliminated{
     animation:none;
@@ -492,6 +523,11 @@
     background:transparent;
     box-shadow:none;
     opacity:1;
+  }
+  .board.board-bg-squares .amount-row.eliminated .sq-word{
+    animation:none;
+    background:transparent;
+    box-shadow:none;
   }
   .board.board-bg-squares .amount-row.eliminated .sq-char-value{
     animation:none;

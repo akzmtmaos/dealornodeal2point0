@@ -2,10 +2,10 @@
 // Case click logic
 // ============================================
 import { game, dom } from './game.js?v=106';
-import { fmt, logEvent } from './helpers.js?v=120';
-import { renderGrid, renderYourCase, renderAll, eliminateBoardValue } from './render.js?v=111';
+import { fmt, logEvent } from './helpers.js?v=121';
+import { renderGrid, renderYourCase, renderAll, eliminateBoardValue } from './render.js?v=112';
 import { revealCaseAnimated, finishPendingReveal, CONTINUE_PAUSE_MS } from './center-stage.js?v=108';
-import { triggerBankerOffer, triggerHypotheticalOffer } from './banker.js?v=115';
+import { triggerBankerOffer, triggerHypotheticalOffer } from './banker.js?v=116';
 import { updateStatus } from './center-stage.js?v=108';
 
 export function onCaseClick(n) {

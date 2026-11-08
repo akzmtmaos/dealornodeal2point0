@@ -10,7 +10,7 @@
    so the wheel's odds are the odds you actually get, and the disc is aimed into
    the winning slice. */
 import { game, dom } from './game.js?v=106';
-import { logEvent, fmt } from './helpers.js?v=120';
+import { logEvent, fmt } from './helpers.js?v=121';
 
 const SPIN_MS = 4200;          // how long the disc coasts
 const EXTRA_TURNS = 5;         // full turns before it settles, so the spin has travel
@@ -48,7 +48,11 @@ function currentOffer() {
  *  11% sliver, half the board is ~33%, a near-fair offer takes ~70%. */
 function dealShareNow() {
   const remaining = game.amounts.filter(a => !a.eliminated).map(a => a.value);
-  const ev = remaining.length ? remaining.reduce((sum, v) => sum + v, 0) / remaining.length : 0;
+  // Prize names count as nothing, exactly like they do in the banker's offer, so
+  // the slice keeps matching the number on the table.
+  const ev = remaining.length
+    ? remaining.reduce((sum, v) => sum + (typeof v === 'number' ? v : 0), 0) / remaining.length
+    : 0;
   const offer = currentOffer();
   const even = { share: 0.5, ratio: 0, offer: 0, source: 'none', ev };
   if (offer.source === 'none' || !(ev > 0)) return even;

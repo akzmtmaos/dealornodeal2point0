@@ -137,7 +137,8 @@ export function offerStripTickSound(step = 0) {
 /** Plays the reveal sting matching the revealed value's tier (same split as
  *  the shelf flash: below 100K is the good/yellow one, 100K+ the red danger). */
 export function playRevealSound(value) {
-  if (value < 100000) {
+  // A prize name has no amount to judge, so it keeps the light sting.
+  if (typeof value !== 'number' || value < 100000) {
     revealSoundLow();
   } else {
     revealSoundHigh();
@@ -316,7 +317,7 @@ function boardEliminateLow() {
  *  split as everywhere else: below 100K is the good one (the recorded
  *  light sting), 100K+ the danger one (the recorded danger sting). */
 export function boardEliminateSound(value) {
-  if (value < 100000) {
+  if (typeof value !== 'number' || value < 100000) {
     boardEliminateLow();
   } else {
     playDangerSfx();

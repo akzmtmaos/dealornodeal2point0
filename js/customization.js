@@ -2,9 +2,9 @@
 // Customization Picker (case interior + board value backgrounds)
 // ============================================
 import { game, dom } from './game.js?v=106';
-import { offerStripTickSound } from './sound.js?v=110';
-import { formatNumber } from './helpers.js?v=120';
-import { renderBoard } from './render.js?v=111';
+import { offerStripTickSound } from './sound.js?v=111';
+import { formatNumber, isPrizeText } from './helpers.js?v=121';
+import { renderBoard } from './render.js?v=112';
 
 /* ---------- Case Interior Background ---------- */
 const BG_OPTIONS = [
@@ -42,14 +42,28 @@ export function getInteriorBgId() {
    contains a larger value. Commas get no square. */
 const SQ_FULL_WIDTH = 7;
 function getBoardSquareWidth() {
-  return Math.max(SQ_FULL_WIDTH, ...game.amounts.map(({ value }) =>
-    formatNumber(value).replace(/,/g, '').length
-  ));
+  const widths = game.amounts
+    .filter(({ value }) => !isPrizeText(value))
+    .map(({ value }) => formatNumber(value).replace(/,/g, '').length);
+  return Math.max(SQ_FULL_WIDTH, ...widths);
 }
 
 export function wrapValueSquares(el, pad) {
   const text = el.textContent;
   el.textContent = '';
+  // A prize name (TRUCK, NOTHING) is one container: the whole word sits in a
+  // single plate instead of one square per character, and it is never padded
+  // out to the board's digit width.
+  if (/[A-Za-z]/.test(text)) {
+    const plate = document.createElement('span');
+    plate.className = 'sq-word';
+    const word = document.createElement('span');
+    word.className = 'sq-char-value';
+    word.textContent = text;
+    plate.appendChild(word);
+    el.appendChild(plate);
+    return;
+  }
   const chars = [];
   for (const ch of text) {
     if (ch === ',') continue; // skip commas — no square needed

@@ -2,9 +2,9 @@
 // End Game
 // ============================================
 import { game, dom } from './game.js?v=106';
-import { fmt } from './helpers.js?v=120';
-import { renderAll } from './render.js?v=111';
-import { triggerDangerFlash } from './helpers.js?v=120';
+import { fmt } from './helpers.js?v=121';
+import { renderAll } from './render.js?v=112';
+import { triggerDangerFlash } from './helpers.js?v=121';
 import { newGame } from './init.js?v=110';
 
 export function endGame(mode, chosenCase, otherCase) {

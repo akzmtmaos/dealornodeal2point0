@@ -2,9 +2,9 @@
 // Prize Board Selection
 // ============================================
 import { game, dom, MIN_CASE_COUNT, MAX_CASE_COUNT } from './game.js?v=106';
-import { buildSchedule, logEvent } from './helpers.js?v=120';
-import { renderAll } from './render.js?v=111';
-import { flashBoard } from './toolbar.js?v=111';
+import { buildSchedule, logEvent } from './helpers.js?v=121';
+import { renderAll } from './render.js?v=112';
+import { flashBoard } from './toolbar.js?v=112';
 import { resetEliminatedFlags, assignCases } from './init.js?v=110';
 
 const PB_STORAGE_KEY = 'dnd_saved_boards';
@@ -32,11 +32,17 @@ function saveSavedBoards(list) {
   localStorage.setItem(PB_STORAGE_KEY, JSON.stringify(list));
 }
 
+/** A saved board entry is either an amount or a prize name (TRUCK, NOTHING). */
+function isBoardValue(value) {
+  if (typeof value === 'string') return value.trim() !== '';
+  return typeof value === 'number' && Number.isFinite(value) && value >= 0;
+}
+
 function isValidSavedBoard(board) {
   return board && typeof board.name === 'string' && board.name.trim() &&
     Array.isArray(board.values) && board.values.length >= MIN_CASE_COUNT &&
     board.values.length <= MAX_CASE_COUNT &&
-    board.values.every(value => typeof value === 'number' && Number.isFinite(value) && value >= 0);
+    board.values.every(isBoardValue);
 }
 
 function boardsMatch(first, second) {
