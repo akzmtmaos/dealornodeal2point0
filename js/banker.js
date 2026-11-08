@@ -328,11 +328,42 @@ export function renderOffersHistory() {
     chip.appendChild(amount);
     dom.offersList.appendChild(chip);
   });
+  fitOfferAmounts();
 }
+
+const OFFER_AMOUNT_MIN_FONT = 9;
+
+/** Keeps a previous offer on one line by stepping its type down inside the plate. */
+function fitOfferAmounts() {
+  dom.offersList.querySelectorAll('.oc-amount').forEach((el) => {
+    el.style.removeProperty('font-size');
+    if (!el.clientWidth) {
+      // The panel can still be hidden while its plates are built; measure once
+      // it is on screen instead of fitting against a zero width.
+      if (!el.dataset.fitRetry) {
+        el.dataset.fitRetry = '1';
+        setTimeout(() => { delete el.dataset.fitRetry; fitOfferAmounts(); }, 0);
+      }
+      return;
+    }
+    const base = parseFloat(getComputedStyle(el).fontSize) || 21;
+    let size = base;
+    for (let i = 0; i < 10 && el.scrollWidth > el.clientWidth + 1; i++) {
+      size = Math.max(OFFER_AMOUNT_MIN_FONT, size * ((el.clientWidth - 2) / Math.max(el.scrollWidth, 1)) * 0.98);
+      el.style.setProperty('font-size', size.toFixed(2) + 'px', 'important');
+      if (size <= OFFER_AMOUNT_MIN_FONT) break;
+    }
+  });
+}
+
+window.addEventListener('resize', () => {
+  if (dom.offersPanel.style.display !== 'none') fitOfferAmounts();
+});
 
 export function showOffersPanel() {
   renderOffersHistory();
   dom.offersPanel.style.display = game.offerHistory.length > 0 ? 'block' : 'none';
+  fitOfferAmounts();
 }
 
 export function hideOffersPanel() {

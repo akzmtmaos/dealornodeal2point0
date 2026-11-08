@@ -4,7 +4,7 @@
 import { game, dom } from './game.js?v=106';
 import { getValuesForCount, buildSchedule, shuffleArr, logEvent, resetGameLog } from './helpers.js?v=123';
 import { renderAll, renderGrid, renderBoard, updateToolbar } from './render.js?v=113';
-import { renderOffersHistory } from './banker.js?v=116';
+import { renderOffersHistory } from './banker.js?v=117';
 import { reshuffleModels } from './models.js?v=2';
 import { hideAll } from './center-stage.js?v=108';
 

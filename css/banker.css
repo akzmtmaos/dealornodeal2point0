@@ -199,6 +199,11 @@
   text-align: right !important;
   box-shadow: 0 2px 5px rgba(0,0,0,0.45), inset 0 1px 0 rgba(247,249,150,0.55) !important;
   position: relative;
+  /* Every plate keeps the same height even when a long offer shrinks its type,
+     so the list still reads as a column of equal plates. */
+  display: flex;
+  align-items: center;
+  min-height: 32px;
   isolation: isolate;
 }
   /* Light blooming off the top and bottom edges of each plate, fading out
@@ -232,6 +237,9 @@
     font-family:'Michroma',sans-serif !important;
     font-size:1.35rem !important;
     line-height:1.1 !important;
+    /* An offer stays on one line; banker.js shrinks the type until it fits. */
+    white-space:nowrap !important;
+    overflow:hidden;
     font-weight:900 !important;
     letter-spacing:0 !important;
     text-align:right !important;

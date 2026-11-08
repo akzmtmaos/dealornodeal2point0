@@ -6,7 +6,7 @@
 // Import all modules (side effects wire up event listeners)
 import './settings.js?v=115';
 import './toolbar.js?v=112';
-import './banker.js?v=116';
+import './banker.js?v=117';
 import './counter.js?v=107';
 import './prize-board.js?v=115';
 import './suggest.js?v=113';
