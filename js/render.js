@@ -2,9 +2,9 @@
 // Rendering
 // ============================================
 import { game, dom } from './game.js?v=106';
-import { fmtDisplayBoard, fmtDisplayBriefcase, getCaseGridRows, getModelGridRows, formatNumber, setBriefcaseAmount, isPrizeText, parsePrizeInput } from './helpers.js?v=123';
-import { onCaseClick } from './cases.js?v=108';
-import { applyInteriorBg, getInteriorBgId, getBoardBgId, applyInteriorAmountStyling, wrapValueSquares, fitWordPlates, refreshCaseCountStrip } from './customization.js?v=125';
+import { fmtDisplayBoard, fmtDisplayBriefcase, getCaseGridRows, getModelGridRows, formatNumber, setBriefcaseAmount, isPrizeText, parsePrizeInput } from './helpers.js?v=124';
+import { onCaseClick } from './cases.js?v=110';
+import { applyInteriorBg, getInteriorBgId, getBoardBgId, applyInteriorAmountStyling, wrapValueSquares, fitWordPlates, refreshCaseCountStrip } from './customization.js?v=127';
 import { refreshRandomizer2 } from './randomizer2.js?v=2';
 import { getModelImage } from './models.js?v=2';
 import { boardEliminateSound } from './sound.js?v=111';
@@ -134,7 +134,11 @@ export function renderGrid() {
         setBriefcaseAmount(rvEl, game.amounts[game.caseAssignment[n - 1]].value);
         applyInteriorAmountStyling(rvEl);
       } else if (isOpened && game.hideOpenedCases) {
-        btn.classList.add('opened', 'opened-hidden');
+        // A case that has just been played stays on the table, dimmed, for a
+        // beat before it leaves — long enough to see where it was.
+        const lingering = game.lingerCase === n && Date.now() < (game.lingerUntil || 0);
+        btn.classList.add('opened');
+        if (!lingering) btn.classList.add('opened-hidden');
       } else if (game.nightVisionMode) {
         btn.classList.add('night-vision');
         const tag = document.createElement('span');

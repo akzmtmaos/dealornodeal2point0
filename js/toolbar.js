@@ -2,8 +2,8 @@
 // Toolbar actions
 // ============================================
 import { game, dom } from './game.js?v=106';
-import { getValuesForCount, parsePrizeInput } from './helpers.js?v=123';
-import { renderBoard, renderAll, updateToolbar } from './render.js?v=113';
+import { getValuesForCount, parsePrizeInput } from './helpers.js?v=124';
+import { renderBoard, renderAll, updateToolbar } from './render.js?v=115';
 import { assignCases } from './init.js?v=110';
 
 function pulseGrid() {

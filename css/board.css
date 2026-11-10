@@ -160,21 +160,24 @@
     padding:8px;
     overflow:visible;
   }
-  .board-col{position:relative;z-index:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px;}
+  .board-col{position:relative;z-index:0;display:flex;flex-direction:column;align-items:flex-end;gap:2px;}
   .board-col:has(.amount-row.eliminating){z-index:20;}
   .amount-row:has(.currency-sym){justify-content:space-between;}
-  .currency-sym{font-size:0.88rem;opacity:0.7;flex-shrink:0;}
-  .currency-num{font-size:0.88rem;text-align:right;}
+  .currency-sym{font-size:1.05rem;opacity:0.7;flex-shrink:0;}
+  .currency-num{font-size:1.05rem;text-align:right;}
   .amount-row{
     display:flex;align-items:center;justify-content:flex-end;
     align-self:flex-end;
     width:fit-content;
     white-space:nowrap;
-    padding:5px 8px;
+    /* A tight plate: the value sits in 20px of line box with 2px of air above
+       and below, so the row reads as a strip of digits rather than a block of
+       yellow. The text stays right-aligned inside the equalised row width. */
+    padding:2px 8px;
     border-radius:0;
     font-family:'Michroma','Archivo Black','Anton',sans-serif;
     font-weight:400;
-    font-size:0.88rem;
+    font-size:1.05rem;
     letter-spacing:0;
     background:linear-gradient(180deg,var(--yellow-hi),var(--yellow));
     color:#1a1608;
@@ -182,102 +185,87 @@
     box-shadow:none;
     transition:transform .3s ease, opacity .3s ease, background .3s ease, box-shadow .3s ease, color .3s ease;
   }
-  /* Michroma sits a couple of pixels low inside its tile: lift the value text
-     so the digits read optically centred. (The squares variant centres each
-     cell itself.) */
+  /* Michroma's ink sits low in its line box: measured at 14.08px the glyphs
+     cover 11px above the baseline and 2px below, which puts the ink centre
+     1.5px under the box centre (7.5% of the 20px box). Lifting by that much is
+     what makes the digits read centred in the plate. A percentage scales with
+     the compact mobile type as well. (The squares variant centres each cell.) */
   .board:not(.board-bg-squares) .amount-row > span{
-    transform:translateY(-2px);
+    transform:translateY(-7.5%);
   }
   .amount-row.eliminating{
     position:relative;
     z-index:10;
-    animation:rowEliminate 1.7s cubic-bezier(.45,.05,.55,.95) forwards;
+    animation:rowEliminate 2s cubic-bezier(.45,.05,.55,.95) forwards;
     transform-origin:center center;
   }
   .amount-row.eliminating > span{
-    animation:rowValueHide 1.7s ease forwards;
+    animation:rowValueHide 2s ease forwards;
   }
 
+  /* The same story the Squares board tells, told on the whole plate: it pushes
+     forward, flips away, flares white at 52% and is gone at 70% — leaving the
+     crossed-off value in grey directly on the board, with no dark tile behind
+     it. Same 2s timing and same beats as the squares' cell and span keyframes,
+     so a value crosses off identically on either board. */
   @keyframes rowEliminate{
     0%{
       transform:perspective(700px) rotateX(0deg) scale(1);
       opacity:1;
       background:var(--yellow);
+      box-shadow:none;
     }
-
     /* Zoom in — dramatic push. */
-    22%{
-      transform:perspective(700px) rotateX(0deg) scale(1.20);
-      opacity:1;
+    24%{
+      transform:perspective(700px) rotateX(0deg) scale(1.06);
       background:var(--yellow);
     }
-    /* Hold a beat before the flip. */
-    30%{
-      transform:perspective(700px) rotateX(0deg) scale(1.20);
-      opacity:1;
+    /* Single flip fast — 0° to 180°. */
+    34%{
+      transform:perspective(700px) rotateX(90deg) scale(1.06);
       background:var(--yellow);
     }
-
-    /* Single flip fast — 0° to 180° (yellow). */
-    33%{
-      transform:perspective(700px) rotateX(90deg) scale(1.20);
-      opacity:1;
+    44%,52%{
+      transform:perspective(700px) rotateX(180deg) scale(1.06);
       background:var(--yellow);
     }
-    36%{
-      transform:perspective(700px) rotateX(180deg) scale(1.20);
+    /* Flare — the same white glow the squares show before they clear. */
+    52.01%,69.99%{
+      transform:perspective(700px) rotateX(180deg) scale(1.06);
+      background:#fffbe0;
+      box-shadow:0 0 12px 4px rgba(255,245,158,0.95), inset 0 0 8px rgba(255,255,255,0.95);
+    }
+    /* Plate gone, value back as grey text, settling to rest. */
+    70%{
+      transform:perspective(700px) rotateX(0deg) scale(1.06);
       opacity:1;
-      background:var(--yellow);
+      background:transparent;
+      box-shadow:none;
+      color:#777;
+      -webkit-text-stroke:0;
     }
-    /* Hold — flipped, still yellow. */
-    44%{
-      transform:perspective(700px) rotateX(180deg) scale(1.20);
-      opacity:1;
-      background:var(--yellow);
-    }
-
-    /* Zoom out — still yellow. */
-    65%{
-      transform:perspective(700px) rotateX(180deg) scale(1);
-      opacity:1;
-      background:var(--yellow);
-    }
-    /* Hold yellow for a beat after zoom lands. */
-    72%{
-      transform:perspective(700px) rotateX(180deg) scale(1);
-      opacity:1;
-      background:var(--yellow);
-    }
-    /* Instant snap to dark eliminated tile + flip back upright. */
-    72.1%{
-      transform:perspective(700px) rotateX(0deg) scale(1);
-      opacity:.5;
-      background:#242424;
-      color:#5a5a5a;
-      -webkit-text-stroke:1.1px #5a5a5a;
-      box-shadow:inset 0 2px 4px rgba(0,0,0,0.5);
-    }
-    /* Hold final state. */
     100%{
       transform:perspective(700px) rotateX(0deg) scale(1);
-      opacity:.5;
-      background:#242424;
-      color:#5a5a5a;
-      -webkit-text-stroke:1.1px #5a5a5a;
-      box-shadow:inset 0 2px 4px rgba(0,0,0,0.5);
+      opacity:1;
+      background:transparent;
+      box-shadow:none;
+      color:#777;
+      -webkit-text-stroke:0;
     }
   }
+  /* The gold value rides the flip, then hands over to the grey one at 70% —
+     the same handover the squares do per cell. */
   @keyframes rowValueHide{
-    0%,30%{opacity:1;}
-    31%,72%{opacity:0;}
-    72.1%,100%{opacity:1;}
+    0%,28%{opacity:1;}
+    34%,69.99%{opacity:0;}
+    70%,100%{opacity:1;}
   }
   .amount-row.eliminated{
-    background:#242424;
-    color:#5a5a5a;
-    -webkit-text-stroke:1.1px #5a5a5a;
-    opacity:0.5;
-    box-shadow:inset 0 2px 4px rgba(0,0,0,0.5);
+    background:transparent;
+    color:#777;
+    -webkit-text-stroke:0;
+    opacity:0.8;
+    box-shadow:none;
     transform:scale(1);
   }
   /* ===== Prize Board Value Background variants (picked in Customization) ===== */
@@ -607,6 +595,11 @@
     font-size:1.2em;
     font-weight:900;
     line-height:1;
+  }
+  /* Classic Yellow asks for a slightly smaller character in the offer strip than
+     the Squares board uses; the cells themselves keep their size. */
+  .banker-offer-tile.offer-squares.offer-strip-classic .offer-sq-char{
+    font-size:1.05em;
   }
   .banker-offer-tile.offer-squares .offer-sq-char .sq-char-value{
     display:inline-block;

@@ -2,9 +2,9 @@
 // Counter Offer
 // ============================================
 import { game, dom } from './game.js?v=106';
-import { fmt, fmtDisplayBoard, logEvent } from './helpers.js?v=123';
-import { renderGrid } from './render.js?v=113';
-import { updateStatus } from './center-stage.js?v=108';
+import { fmt, fmtDisplayBoard, logEvent } from './helpers.js?v=124';
+import { renderGrid } from './render.js?v=115';
+import { updateStatus } from './center-stage.js?v=112';
 import { acceptOffer, renderOffersHistory, showFinalDecision } from './banker.js?v=117';
 
 export function revealCounterDecision() {

@@ -2,9 +2,9 @@
 // Banker Offer
 // ============================================
 import { game, dom } from './game.js?v=106';
-import { fmt, fmtDisplayBoard, logEvent, remainingAmountValues, isPrizeText } from './helpers.js?v=123';
-import { renderGrid, renderAll, eliminateBoardValue, blinkTableShelves } from './render.js?v=113';
-import { revealCaseAnimated, updateStatus, hideAll } from './center-stage.js?v=108';
+import { fmt, fmtDisplayBoard, logEvent, remainingAmountValues, isPrizeText } from './helpers.js?v=124';
+import { renderGrid, renderAll, eliminateBoardValue, blinkTableShelves } from './render.js?v=115';
+import { revealCaseAnimated, updateStatus, hideAll } from './center-stage.js?v=112';
 import { showFinalDecision } from './final.js?v=117';
 import { endGame } from './end.js?v=115';
 import { revealCounterDecision } from './counter.js?v=107';

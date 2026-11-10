@@ -2,8 +2,8 @@
 // Prize Board Selection
 // ============================================
 import { game, dom, MIN_CASE_COUNT, MAX_CASE_COUNT } from './game.js?v=106';
-import { buildSchedule, logEvent } from './helpers.js?v=123';
-import { renderAll } from './render.js?v=113';
+import { buildSchedule, logEvent } from './helpers.js?v=124';
+import { renderAll } from './render.js?v=115';
 import { flashBoard } from './toolbar.js?v=112';
 import { resetEliminatedFlags, assignCases } from './init.js?v=110';
 

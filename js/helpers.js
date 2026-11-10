@@ -88,7 +88,18 @@ export function setBriefcaseAmount(el, value) {
     currency.textContent = '$';
     el.appendChild(currency);
   }
-  el.appendChild(document.createTextNode(formatNumber(value)));
+  // Thousands breaks get their own element: the comma is set in a condensed
+  // sans instead of the wide display face the digits use.
+  const digits = formatNumber(value);
+  digits.split(',').forEach((part, i) => {
+    if (i) {
+      const comma = document.createElement('span');
+      comma.className = 'case-value-comma';
+      comma.textContent = ',';
+      el.appendChild(comma);
+    }
+    el.appendChild(document.createTextNode(part));
+  });
   fitCaseValue(el);
 }
 

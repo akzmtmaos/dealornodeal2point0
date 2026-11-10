@@ -2,11 +2,11 @@
 // Init / New Game
 // ============================================
 import { game, dom } from './game.js?v=106';
-import { getValuesForCount, buildSchedule, shuffleArr, logEvent, resetGameLog } from './helpers.js?v=123';
-import { renderAll, renderGrid, renderBoard, updateToolbar } from './render.js?v=113';
+import { getValuesForCount, buildSchedule, shuffleArr, logEvent, resetGameLog } from './helpers.js?v=124';
+import { renderAll, renderGrid, renderBoard, updateToolbar } from './render.js?v=115';
 import { renderOffersHistory } from './banker.js?v=117';
 import { reshuffleModels } from './models.js?v=2';
-import { hideAll } from './center-stage.js?v=108';
+import { hideAll } from './center-stage.js?v=112';
 
 export function initValues() {
   game.amounts = getValuesForCount(game.caseCount).map(v => ({ value: v, eliminated: false }));

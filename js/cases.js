@@ -2,11 +2,14 @@
 // Case click logic
 // ============================================
 import { game, dom } from './game.js?v=106';
-import { fmt, logEvent } from './helpers.js?v=123';
-import { renderGrid, renderYourCase, renderAll, eliminateBoardValue } from './render.js?v=113';
-import { revealCaseAnimated, finishPendingReveal, CONTINUE_PAUSE_MS } from './center-stage.js?v=108';
+import { fmt, logEvent } from './helpers.js?v=124';
+import { renderGrid, renderYourCase, renderAll, eliminateBoardValue } from './render.js?v=115';
+import { revealCaseAnimated, finishPendingReveal, CONTINUE_PAUSE_MS, setPeekAvailable } from './center-stage.js?v=112';
 import { triggerBankerOffer, triggerHypotheticalOffer } from './banker.js?v=117';
-import { updateStatus } from './center-stage.js?v=108';
+import { updateStatus } from './center-stage.js?v=112';
+
+// How long a played case hangs about on the table, dimmed, before it goes.
+const OPENED_LINGER_MS = 5000;
 
 export function onCaseClick(n) {
   if (game.state === 'setup' && game.yourCase === null) {
@@ -40,6 +43,9 @@ function openCase(n) {
   renderGrid();
   const selectedCase = dom.caseGrid.querySelector(`.briefcase[data-num="${n}"]`);
   if (selectedCase) selectedCase.classList.add('focus-case');
+  // A case is picked for opening: the peek button is there from this instant,
+  // not just once the case has finished travelling to the centre.
+  setPeekAvailable(true);
   const beginCenterReveal = () => {
     revealCaseAnimated(n, 'Case #' + n, (value, idx) => {
       finishOpen(n, idx);
@@ -70,7 +76,19 @@ function finishOpen(n, idx) {
   logEvent(`[Round ${game.roundIndex + 1}] Eliminated <b>Case #${n}</b> — ${fmt(game.amounts[idx].value)}`);
 
   const roundComplete = game.openedInRound >= (game.schedule[game.roundIndex] || 0);
+  // The case that has just been played waits, dimmed, before it leaves the
+  // table — the grid leaves it in place until this timer is up.
+  game.lingerCase = n;
+  game.lingerUntil = Date.now() + OPENED_LINGER_MS;
   renderGrid();
+  setTimeout(() => {
+    if (game.lingerCase !== n) return;
+    game.lingerCase = null;
+    game.lingerUntil = 0;
+    if (!game.hideOpenedCases || !game.openedCases.has(n)) return;
+    const el = dom.caseGrid.querySelector(`.briefcase[data-num="${n}"]`);
+    if (el) el.classList.add('opened-hidden');
+  }, OPENED_LINGER_MS);
   renderYourCase();
   updateStatus();
   dom.caseGrid.classList.add('reveal-focus');

@@ -3,8 +3,8 @@
 // ============================================
 import { game, dom } from './game.js?v=106';
 import { offerStripTickSound } from './sound.js?v=111';
-import { formatNumber, isPrizeText } from './helpers.js?v=123';
-import { renderBoard } from './render.js?v=113';
+import { formatNumber, isPrizeText } from './helpers.js?v=124';
+import { renderBoard } from './render.js?v=115';
 
 /* ---------- Case Interior Background ---------- */
 const BG_OPTIONS = [
@@ -120,6 +120,10 @@ export function fitWordPlates() {
    sync with every writer of the tile (offer reveal, currency refresh, DEAL /
    NO DEAL, counter offer); the counter-offer markup keeps its normal design. */
 const OFFER_SQUARES_TEXT = /^[0-9,$.\s]+$/;
+/* Board styles whose offer tile is built from square cells: the Squares board
+   itself and the default Classic Yellow board. The remaining backgrounds keep
+   the plain tile. */
+const OFFER_STRIP_BG_IDS = new Set(['squares', 'default']);
 /* Decision words keep their own cell layout in the strip:
    DEAL    -> [ ][ ][D][E][A][L][ ]  (centered)
    NO DEAL -> [N][O][ ][D][E][A][L]  (the word gap stays a blank cell) */
@@ -327,7 +331,11 @@ function renderOfferTileSquares() {
   // away so every branch below behaves as if no offer had been written yet.
   const statusShown = lastCaseCountText !== null && rawText === lastCaseCountText;
   const text = statusShown ? '' : rawText;
-  const squaresMode = getBoardBgId() === 'squares';
+  const bgId = getBoardBgId();
+  const squaresMode = OFFER_STRIP_BG_IDS.has(bgId);
+  // Classic Yellow sets its strip's characters a touch smaller than Squares
+  // does, so the tile carries the board it belongs to.
+  tile.classList.toggle('offer-strip-classic', bgId === 'default');
   const isAmount = !!text && OFFER_SQUARES_TEXT.test(text);
   const decisionCells = OFFER_DECISION_CELLS[text];
   // While the banker is on the line the strip is either about to show an offer

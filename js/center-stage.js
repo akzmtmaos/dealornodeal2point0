@@ -2,9 +2,9 @@
 // Center-stage opening animation
 // ============================================
 import { game, dom } from './game.js?v=106';
-import { setBriefcaseAmount, isBigValue, isLowValue, isHighestRemaining, triggerDangerFlash, triggerYellowFlash } from './helpers.js?v=123';
-import { caseInnerMarkup, flashTableShelves, clearShelfFlash } from './render.js?v=113';
-import { applyInteriorBg, getInteriorBgId, applyInteriorAmountStyling } from './customization.js?v=125';
+import { setBriefcaseAmount, isBigValue, isLowValue, isHighestRemaining, triggerDangerFlash, triggerYellowFlash } from './helpers.js?v=124';
+import { caseInnerMarkup, flashTableShelves, clearShelfFlash } from './render.js?v=115';
+import { applyInteriorBg, getInteriorBgId, applyInteriorAmountStyling } from './customization.js?v=127';
 import { revealSoundLow, revealSoundHigh, playRevealSound, startTensionRoll, stopBankerRingLoop } from './sound.js?v=111';
 
 export function hideAll() {
@@ -25,7 +25,50 @@ export function hideAll() {
   dom.endBackdrop.classList.remove('show');
   dom.dangerFlash.classList.remove('pulse');
   dom.badDecisionNote.style.display = 'none';
+  setPeekAvailable(false);
 }
+
+/* ---------- Background peek ---------- */
+/* The eye button in the top corner only exists while a case is being revealed.
+   One click minimizes the whole interface so the room background is visible on
+   its own; the next click (or the end of the reveal) brings the game back. */
+let peekButton = null;
+
+function peekBtn() {
+  if (!peekButton) peekButton = document.getElementById('bgPeekBtn');
+  return peekButton;
+}
+
+function setPeek(on) {
+  document.body.classList.toggle('bg-peek', on);
+  const btn = peekBtn();
+  if (!btn) return;
+  btn.classList.toggle('active', on);
+  btn.title = on ? 'Back to the game' : 'Peek at the background';
+  btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+}
+
+export function setPeekAvailable(on) {
+  if (!on) setPeek(false);
+  const btn = peekBtn();
+  if (!btn) return;
+  btn.classList.toggle('show', !!on);
+}
+
+(() => {
+  const wire = () => {
+    const btn = peekBtn();
+    if (!btn) return;
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      // The button is display:none between reveals — never act on a stale click.
+      if (!btn.classList.contains('show')) return;
+      setPeek(!document.body.classList.contains('bg-peek'));
+    });
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wire);
+  else wire();
+})();
 
 export function updateStatus() {
   const remainingUnopened = game.caseCount - 1 - game.openedCases.size;
@@ -79,6 +122,8 @@ export function revealCaseAnimated(n, label, callback, dangerAware, onCancel, re
 
   dom.spotlightBackdrop.classList.add('show');
   dom.centerStage.classList.add('show');
+  // The case is on its way to the stage — the peek button is available now.
+  setPeekAvailable(true);
 
   let travelMs = 0;
   if (startRect) {
@@ -134,6 +179,19 @@ export function revealCaseAnimated(n, label, callback, dangerAware, onCancel, re
     }
   }
 
+  // The case left behind on the table opens with its twin: the cover swings
+  // back and the value settles into its interior at the same beat the big one
+  // plays, so the table never shows a case shut while its value is on screen.
+  function openTwinLid() {
+    if (!gridBtn || gridBtn.classList.contains('opened')) return;
+    const twinVal = gridBtn.querySelector('.amount-val');
+    if (twinVal && !twinVal.textContent.trim()) {
+      setBriefcaseAmount(twinVal, value);
+      applyInteriorAmountStyling(twinVal);
+    }
+    gridBtn.classList.add('lid-open');
+  }
+
   function finishReveal() {
     // Manual mode: leave the stage on screen and surface a Continue button
     // at the bottom center so the player controls when to move on.
@@ -158,6 +216,7 @@ export function revealCaseAnimated(n, label, callback, dangerAware, onCancel, re
         dom.spotlightBackdrop.classList.remove('show');
         dom.manualSlider.style.display = 'none';
         dom.manualBackBtn.style.display = 'none';
+        setPeekAvailable(false);
       }, 150);
       // ...then hold the beat before the prize-board removal
       // animation, so the closed case gets a moment to itself.
@@ -175,6 +234,7 @@ export function revealCaseAnimated(n, label, callback, dangerAware, onCancel, re
     setTimeout(() => {
       dom.centerStageLabel.classList.add('show');
       startManualSlider(() => {
+        openTwinLid();
         revealDrama();
         finishReveal();
       }, typeof onCancel === 'function' ? () => {
@@ -183,12 +243,14 @@ export function revealCaseAnimated(n, label, callback, dangerAware, onCancel, re
         dom.manualSlider.style.display = 'none';
         if (gridBtn) gridBtn.classList.remove('focus-case', 'lifted');
         dom.caseGrid.classList.remove('reveal-focus');
+        setPeekAvailable(false);
         onCancel();
       } : null);
     }, travelMs + 280);
   } else {
     setTimeout(() => {
       dom.centerCase.classList.add('lid-open');
+      openTwinLid();
       dom.centerStageLabel.classList.add('show');
       // Drumroll builds tension and peaks right as the value is revealed.
       startTensionRoll(0.65);
@@ -199,6 +261,7 @@ export function revealCaseAnimated(n, label, callback, dangerAware, onCancel, re
     setTimeout(() => {
       dom.centerStage.classList.remove('show');
       dom.spotlightBackdrop.classList.remove('show');
+      setPeekAvailable(false);
       // Auto reveals have no Continue button, so the stage closing is what
       // releases the shelf wash.
       clearShelfFlash();

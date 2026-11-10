@@ -327,8 +327,11 @@
     width:max-content;
     max-width:82%;
     /* A value the type can no longer shrink enough to fit is clipped at the
-       plate instead of spilling out of the case. */
-    overflow:hidden;
+       plate instead of spilling out of the case. The clip margin keeps the
+       plate at its size while letting the tails of the commas hang just past
+       its bottom edge, so a separator is never cut in half. */
+    overflow:clip;
+    overflow-clip-margin:0.5em;
     font-family:'Michroma',sans-serif;
     font-weight:400;
     font-size:2rem;
@@ -338,6 +341,19 @@
     text-align:center;
     line-height:1;
     white-space:nowrap;
+  }
+  /* The value is laid out piecewise so each part keeps its own width. */
+  .amount-val > *{
+    flex:0 0 auto;
+  }
+  /* Thousands separators drop out of the display face (wide Michroma) into a
+     condensed sans, so the breaks in a long value read cleanly. The stroke is
+     inherited so the comma carries the same weight as the digits. */
+  .amount-val .case-value-comma{
+    font-family:'Oswald','Arial',sans-serif;
+    font-weight:500;
+    /* A hair of air either side so the separator never crowds its digits. */
+    margin:0 1px;
   }
   .briefcase-currency{
     font-size:0.72em;
@@ -379,11 +395,15 @@
     100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(0.3);}
   }
 
-  /* the grid button dims to a placeholder while its big twin plays center-stage */
+  /* The case being opened keeps its light while its big twin plays
+     center-stage: it stays at full brightness instead of fading back into the
+     table, so the player can still see which case is up. No selection ring —
+     the brightness alone marks it. */
   .briefcase.lifted{
-    opacity:0.28;
-    filter:grayscale(0.6);
+    opacity:1;
+    filter:none;
     pointer-events:none;
+    z-index:3;
   }
   /* During a reveal, leave the selected case in focus while the other unopened
      cases fall into shadow beneath the center-stage spotlight. */
@@ -590,9 +610,10 @@
     opacity:0.42;
     filter:brightness(0.48) saturate(0.4);
   }
+  /* The picked case's picture shares its light: full brightness, no ring. */
   .case-cell:has(> .briefcase.lifted) .model-avatar{
-    opacity:0.28;
-    filter:grayscale(0.6);
+    opacity:1;
+    filter:none;
   }
   .case-grid.reveal-focus .case-cell:has(> .briefcase:not(.focus-case):not(.opened)) .model-avatar{
     opacity:0.45;

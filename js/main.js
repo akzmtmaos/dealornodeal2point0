@@ -11,7 +11,7 @@ import './counter.js?v=107';
 import './prize-board.js?v=115';
 import './suggest.js?v=113';
 import './randomizer2.js?v=2';
-import './customization.js?v=125';
+import './customization.js?v=127';
 
 // Import init for startup
 import { game, dom } from './game.js?v=106';
@@ -19,7 +19,7 @@ import { initValues, newGame } from './init.js?v=110';
 import { initModels } from './models.js?v=2';
 import { initWheel } from './wheel.js?v=10';
 import { initColorController } from './color-controller.js?v=2';
-import { renderGrid } from './render.js?v=113';
+import { renderGrid } from './render.js?v=115';
 
 // ---- Go ----
 dom.caseCountInput.value = dom.caseCountInput.defaultValue;

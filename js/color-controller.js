@@ -8,7 +8,7 @@
    last card hands over the paint pots and lets you choose any colour you like,
    MS Paint style. Picking one repaints the whole app. */
 import { dom } from './game.js?v=106';
-import { logEvent } from './helpers.js?v=123';
+import { logEvent } from './helpers.js?v=124';
 
 const STORAGE_KEY = 'dnd_color_theme';
 const CUSTOM_KEY = 'dnd_color_custom';

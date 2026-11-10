@@ -10,7 +10,7 @@
    so the wheel's odds are the odds you actually get, and the disc is aimed into
    the winning slice. */
 import { game, dom } from './game.js?v=106';
-import { logEvent, fmt } from './helpers.js?v=123';
+import { logEvent, fmt } from './helpers.js?v=124';
 
 const SPIN_MS = 4200;          // how long the disc coasts
 const EXTRA_TURNS = 5;         // full turns before it settles, so the spin has travel
